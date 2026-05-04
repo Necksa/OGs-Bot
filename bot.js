@@ -20,6 +20,7 @@ const client = new Client({
 const WELCOME_CHANNEL_NAME = 'welcome';       // Name of your welcome channel
 const AUTO_ROLE_NAME       = 'Member';        // Role to give new members
 const PREFIX               = '!';            // Command prefix
+const memory = new Map();
 
 // ──────────────────────────────────────────────
 //  BOT READY
@@ -100,61 +101,98 @@ client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
 
   // ───────── BOT MENTION CHAT SYSTEM ─────────
-  if (message.mentions.has(client.user)) {
-    const userMessage = message.content
-      .replace(`<@${client.user.id}>`, '')
-      .replace(`<@!${client.user.id}>`, '')
-      .trim()
-      .toLowerCase();
+  // ───────── BOT MENTION CHAT SYSTEM + MEMORY ─────────
+if (message.mentions.has(client.user)) {
+  const userId = message.author.id;
 
-    if (!userMessage) {
-      const replies = [
-        "You called me?",
-        "Say something bro 😭",
-        "I'm here 👀",
-        "Don't just ping me, talk to me.",
-      ];
-      return message.reply(replies[Math.floor(Math.random() * replies.length)]);
-    }
+  const userMessage = message.content
+    .replace(`<@${client.user.id}>`, '')
+    .replace(`<@!${client.user.id}>`, '')
+    .trim()
+    .toLowerCase();
 
-    if (userMessage.includes("hi") || userMessage.includes("hello")) {
-      return message.reply("Yo 😎 what's up?");
-    }
-
-    if (userMessage.includes("how are you")) {
-      return message.reply("Alive and watching the server 👀 you?");
-    }
-
-    if (userMessage.includes("who are you")) {
-      return message.reply("I'm the brain of this server. Respect me.");
-    }
-
-    if (userMessage.includes("stupid") || userMessage.includes("idiot")) {
-      return message.reply("Relax bro 😭 I just got here.");
-    }
-
-    if (userMessage.includes("?")) {
-      const answers = [
-        "Honestly? 50-50.",
-        "I wouldn’t risk it.",
-        "Yeah… that’s not happening.",
-        "Go for it 😏",
-      ];
-      return message.reply(answers[Math.floor(Math.random() * answers.length)]);
-    }
-
-    const fallback = [
-      "Hmm interesting... tell me more.",
-      "Why do you say that?",
-      "I feel like there's a story here 👀",
-      "Explain that properly.",
-    ];
-
-    return message.reply(fallback[Math.floor(Math.random() * fallback.length)]);
+  // create memory if not exists
+  if (!memory.has(userId)) {
+    memory.set(userId, {});
   }
 
-  // ───────── COMMAND SYSTEM (your original code) ─────────
-  if (!message.content.startsWith(PREFIX)) return;
+  const userMemory = memory.get(userId);
+
+  // store last message
+  userMemory.lastMessage = userMessage;
+
+  // remember name
+  if (userMessage.includes("my name is")) {
+    const name = userMessage.split("my name is")[1].trim();
+    userMemory.name = name;
+    return message.reply(`Got it, ${name} 😎`);
+  }
+
+  // recall name
+  if (userMessage.includes("what's my name") || userMessage.includes("what is my name")) {
+    if (userMemory.name) {
+      return message.reply(`You told me your name is ${userMemory.name}`);
+    } else {
+      return message.reply("You never told me your name 🤨");
+    }
+  }
+
+  // recall last message
+  if (userMessage.includes("what did i say")) {
+    if (userMemory.lastMessage) {
+      return message.reply(`You said: "${userMemory.lastMessage}"`);
+    }
+  }
+
+  // normal convo (keep your vibe)
+  if (userMessage.includes("hi") || userMessage.includes("hello")) {
+    return message.reply("Yo 😎 what's up?");
+  }
+
+  if (userMessage.includes("how are you")) {
+    return message.reply("Alive and watching the server 👀 you?");
+  }
+
+  return message.reply("Hmm... I’m remembering things now 👀");
+}
+
+  // ───────── COMMAND SYSTEM  ─────────
+  // 🎯 Random conversation trigger (no mention needed)
+const randomChance = Math.random();
+
+if (!message.mentions.has(client.user) && !message.content.startsWith(PREFIX)) {
+  if (randomChance > 0.2) return; // 20% chance to reply
+
+  const msg = message.content.toLowerCase();
+
+  if (msg.includes("hi") || msg.includes("hello")) {
+    return message.reply("Yo 😎 what's up?");
+  }
+
+  if (msg.includes("anyone") || msg.includes("dead chat")) {
+    return message.reply("I'm here bro 😭 this chat ain't dead yet");
+  }
+
+  if (msg.includes("game") || msg.includes("play")) {
+    return message.reply("What are we playing? Don't say Valorant 💀");
+  }
+
+  if (msg.includes("bored")) {
+    return message.reply("Same. Someone start drama or something.");
+  }
+
+  if (msg.includes("?")) {
+    const answers = [
+      "Lowkey yes.",
+      "I wouldn't do it.",
+      "Sounds like a bad idea ngl.",
+      "Go for it 😏",
+    ];
+    return message.reply(answers[Math.floor(Math.random() * answers.length)]);
+  }
+
+  return message.reply("Hmm... interesting.");
+}
 
   const args    = message.content.slice(PREFIX.length).trim().split(/ +/);
   const command = args.shift().toLowerCase();
