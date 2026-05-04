@@ -99,6 +99,36 @@ const eightBallResponses = [
 
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
+  // ✅ COMMAND SYSTEM FIRST (priority)
+if (message.content.startsWith(PREFIX)) {
+  const args = message.content.slice(PREFIX.length).trim().split(/ +/);
+  const command = args.shift().toLowerCase();
+
+  // --- VALO COMMAND ---
+  if (command === 'valo') {
+    const input = args[0];
+
+    if (!input || !input.includes("#")) {
+      return message.reply("Use like this: !valo username#tag");
+    }
+
+    const [name, tag] = input.split("#");
+
+    try {
+      const res = await axios.get(
+        `https://api.henrikdev.xyz/valorant/v1/account/${name}/${tag}`
+      );
+
+      const player = res.data.data;
+
+      return message.reply(`Found player: ${player.name}#${player.tag}`);
+    } catch (err) {
+      return message.reply("Couldn't find that player.");
+    }
+  }
+
+  // 👇 KEEP YOUR OTHER COMMANDS BELOW THIS
+}
 
   // ───────── BOT MENTION CHAT SYSTEM ─────────
   // ───────── BOT MENTION CHAT SYSTEM + MEMORY ─────────
@@ -153,7 +183,15 @@ if (message.mentions.has(client.user)) {
     return message.reply("Alive and watching the server 👀 you?");
   }
 
-  return message.reply("Hmm... I’m remembering things now 👀");
+  const replies = [
+  "Hmm… interesting 👀",
+  "Tell me more",
+  "Why do you say that?",
+  "I’m listening…",
+  "That sounds sus ngl"
+];
+
+return message.reply(replies[Math.floor(Math.random() * replies.length)]);
 }
 
   // ───────── COMMAND SYSTEM  ─────────
