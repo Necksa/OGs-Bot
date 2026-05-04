@@ -98,6 +98,62 @@ const eightBallResponses = [
 
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
+
+  // ───────── BOT MENTION CHAT SYSTEM ─────────
+  if (message.mentions.has(client.user)) {
+    const userMessage = message.content
+      .replace(`<@${client.user.id}>`, '')
+      .replace(`<@!${client.user.id}>`, '')
+      .trim()
+      .toLowerCase();
+
+    if (!userMessage) {
+      const replies = [
+        "You called me?",
+        "Say something bro 😭",
+        "I'm here 👀",
+        "Don't just ping me, talk to me.",
+      ];
+      return message.reply(replies[Math.floor(Math.random() * replies.length)]);
+    }
+
+    if (userMessage.includes("hi") || userMessage.includes("hello")) {
+      return message.reply("Yo 😎 what's up?");
+    }
+
+    if (userMessage.includes("how are you")) {
+      return message.reply("Alive and watching the server 👀 you?");
+    }
+
+    if (userMessage.includes("who are you")) {
+      return message.reply("I'm the brain of this server. Respect me.");
+    }
+
+    if (userMessage.includes("stupid") || userMessage.includes("idiot")) {
+      return message.reply("Relax bro 😭 I just got here.");
+    }
+
+    if (userMessage.includes("?")) {
+      const answers = [
+        "Honestly? 50-50.",
+        "I wouldn’t risk it.",
+        "Yeah… that’s not happening.",
+        "Go for it 😏",
+      ];
+      return message.reply(answers[Math.floor(Math.random() * answers.length)]);
+    }
+
+    const fallback = [
+      "Hmm interesting... tell me more.",
+      "Why do you say that?",
+      "I feel like there's a story here 👀",
+      "Explain that properly.",
+    ];
+
+    return message.reply(fallback[Math.floor(Math.random() * fallback.length)]);
+  }
+
+  // ───────── COMMAND SYSTEM (your original code) ─────────
   if (!message.content.startsWith(PREFIX)) return;
 
   const args    = message.content.slice(PREFIX.length).trim().split(/ +/);
@@ -120,13 +176,11 @@ client.on('messageCreate', async (message) => {
     return message.reply({ embeds: [embed] });
   }
 
-  // --- !joke ---
   if (command === 'joke') {
     const joke = jokes[Math.floor(Math.random() * jokes.length)];
     return message.reply(joke);
   }
 
-  // --- !8ball ---
   if (command === '8ball') {
     const question = args.join(' ');
     if (!question) return message.reply('❓ Ask me a question! e.g. `!8ball Will I win today?`');
@@ -141,13 +195,11 @@ client.on('messageCreate', async (message) => {
     return message.reply({ embeds: [embed] });
   }
 
-  // --- !flip ---
   if (command === 'flip') {
     const result = Math.random() < 0.5 ? '🪙 Heads!' : '🪙 Tails!';
     return message.reply(result);
   }
 
-  // --- !roll ---
   if (command === 'roll') {
     const sides = parseInt(args[0]) || 6;
     if (sides < 2 || sides > 1000) return message.reply('Please pick between 2 and 1000 sides!');
@@ -155,14 +207,12 @@ client.on('messageCreate', async (message) => {
     return message.reply(`🎲 You rolled a **${result}** (d${sides})`);
   }
 
-  // --- !hug ---
   if (command === 'hug') {
     const target = message.mentions.users.first();
     if (!target) return message.reply('Tag someone to hug! e.g. `!hug @friend`');
     return message.reply(`🤗 ${message.author} gives ${target} a big warm hug!`);
   }
 
-  // --- !serverinfo ---
   if (command === 'serverinfo') {
     const guild = message.guild;
     const embed = new EmbedBuilder()
