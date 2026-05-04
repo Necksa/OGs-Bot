@@ -1,5 +1,5 @@
 // ============================================================
-//  CLEAN DISCORD BOT
+//  CLEAN DISCORD BOT (UPGRADED)
 // ============================================================
 
 const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
@@ -30,7 +30,7 @@ client.on('guildMemberAdd', async (member) => {
   try {
     const role = member.guild.roles.cache.find(r => r.name === AUTO_ROLE_NAME);
     if (role) await member.roles.add(role);
-  } catch (err) {}
+  } catch {}
 
   const channel = member.guild.channels.cache.find(c => c.name === WELCOME_CHANNEL_NAME);
   if (!channel) return;
@@ -62,10 +62,8 @@ client.on('messageCreate', async (message) => {
     const args = message.content.slice(PREFIX.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
 
-    // VALO
     if (command === 'valo') {
       const input = args[0];
-
       if (!input || !input.includes("#")) {
         return message.reply("Use: !valo username#tag");
       }
@@ -109,8 +107,8 @@ client.on('messageCreate', async (message) => {
       .trim()
       .toLowerCase();
 
-    // HINDI DETECTION
-    const hindiWords = ["kya", "kaise", "nahi", "haan", "bhai", "kyu", "kahan"];
+    // 🇮🇳 Hindi detection
+    const hindiWords = ["kya", "kaise", "nahi", "haan", "bhai", "kyu", "kahan", "kar", "rha", "hai"];
     if (hindiWords.some(word => userMessage.includes(word))) {
       await message.channel.sendTyping();
       return message.reply("bhai hindi nahi aati, english pls, i am foreign bot 😭");
@@ -130,7 +128,44 @@ client.on('messageCreate', async (message) => {
       return message.reply(userMemory.name || "You never told me 🤨");
     }
 
-    // CONVERSATION
+    // 🔥 CUSTOM LOGIC (YOUR IDEAS)
+
+    if (userMessage.includes("hello bro")) {
+      const replies = [
+        "haan bro (thats all the hindi I could afford)",
+        "haan btao?"
+      ];
+      await message.channel.sendTyping();
+      return message.reply(replies[Math.floor(Math.random() * replies.length)]);
+    }
+
+    if (userMessage.includes("good morning bro")) {
+      const now = new Date();
+      const istTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+      const hours = istTime.getHours();
+
+      let timeOfDay = "night";
+      if (hours < 12) timeOfDay = "morning";
+      else if (hours < 17) timeOfDay = "afternoon";
+      else if (hours < 21) timeOfDay = "evening";
+
+      await message.channel.sendTyping();
+      return message.reply(`bro good morning at ${timeOfDay} 💀`);
+    }
+
+    if (userMessage.includes("i am sad") || userMessage.includes("im sad")) {
+      await message.channel.sendTyping();
+      return message.reply(
+        "I'd play you Lonely. but i cant, so here's the song link for you https://www.youtube.com/watch?v=djU4Lq_5EaM"
+      );
+    }
+
+    if (userMessage.includes("play valo") || userMessage.includes("play valorant")) {
+      await message.channel.sendTyping();
+      return message.reply("Hatt 💀");
+    }
+
+    // GENERAL CONVO
     if (userMessage.includes("hi") || userMessage.includes("hello")) {
       await message.channel.sendTyping();
       return message.reply("Yo 😎 what's up?");
