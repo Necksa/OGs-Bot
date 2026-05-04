@@ -1,5 +1,5 @@
 // ============================================================
-//  CLEAN DISCORD BOT (UPGRADED)
+//  CLEAN DISCORD BOT (UPGRADED + ANALYTICS + VALO PERSONALITY)
 // ============================================================
 
 const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
@@ -17,7 +17,10 @@ const client = new Client({
 const WELCOME_CHANNEL_NAME = 'welcome';
 const AUTO_ROLE_NAME = 'Member';
 const PREFIX = '!';
+
+// MEMORY + STATS
 const memory = new Map();
+const stats = {};
 
 // READY
 client.once('ready', () => {
@@ -57,11 +60,17 @@ const eightBallResponses = [
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
 
+  // 📊 TRACK STATS
+  const userId = message.author.id;
+  if (!stats[userId]) stats[userId] = { messages: 0 };
+  stats[userId].messages++;
+
   // ================= COMMANDS =================
   if (message.content.startsWith(PREFIX)) {
     const args = message.content.slice(PREFIX.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
 
+    // VALO WITH PERSONALITY
     if (command === 'valo') {
       const input = args[0];
       if (!input || !input.includes("#")) {
@@ -77,11 +86,38 @@ client.on('messageCreate', async (message) => {
 
         const player = res.data.data;
 
+        const personalities = [
+          "Entry fragger. Runs in and dies first 😭",
+          "Baiter. Lets team die then gets kills 💀",
+          "Support player. Actually useful for once",
+          "Instalock duelist. No aim, only confidence",
+          "Rank grinder. Plays like life depends on it"
+        ];
+
+        const personality = personalities[Math.floor(Math.random() * personalities.length)];
+
         await message.channel.sendTyping();
-        return message.reply(`Found player: ${player.name}#${player.tag}`);
+        return message.reply(
+          `${player.name}#${player.tag}\n\nPlaystyle: ${personality}`
+        );
+
       } catch {
         return message.reply("Couldn't find that player.");
       }
+    }
+
+    // 📊 STATS COMMAND
+    if (command === 'stats') {
+      const sorted = Object.entries(stats)
+        .sort((a, b) => b[1].messages - a[1].messages);
+
+      if (!sorted.length) return message.reply("No data yet.");
+
+      const topUser = sorted[0];
+
+      return message.reply(
+        `Top chatter: <@${topUser[0]}> with ${topUser[1].messages} messages`
+      );
     }
 
     if (command === 'joke') {
@@ -93,14 +129,12 @@ client.on('messageCreate', async (message) => {
     }
 
     if (command === 'help') {
-      return message.reply("Commands: !valo, !joke, !8ball");
+      return message.reply("Commands: !valo, !joke, !8ball, !stats");
     }
   }
 
   // ================= MENTION CHAT =================
   if (message.mentions.has(client.user)) {
-    const userId = message.author.id;
-
     const userMessage = message.content
       .replace(`<@${client.user.id}>`, '')
       .replace(`<@!${client.user.id}>`, '')
@@ -108,7 +142,7 @@ client.on('messageCreate', async (message) => {
       .toLowerCase();
 
     // 🇮🇳 Hindi detection
-    const hindiWords = ["kya", "kaise", "nahi", "haan", "bhai", "kyu", "kahan", "kar", "rha", "hai"];
+    const hindiWords = ["kya", "kaise", "nahi", "haan", "bhai", "kyu", "kahan"];
     if (hindiWords.some(word => userMessage.includes(word))) {
       await message.channel.sendTyping();
       return message.reply("bhai hindi nahi aati, english pls, i am foreign bot 😭");
@@ -128,8 +162,7 @@ client.on('messageCreate', async (message) => {
       return message.reply(userMemory.name || "You never told me 🤨");
     }
 
-    // 🔥 CUSTOM LOGIC (YOUR IDEAS)
-
+    // CUSTOM LOGIC
     if (userMessage.includes("hello bro")) {
       const replies = [
         "haan bro (thats all the hindi I could afford)",
@@ -156,11 +189,11 @@ client.on('messageCreate', async (message) => {
     if (userMessage.includes("i am sad") || userMessage.includes("im sad")) {
       await message.channel.sendTyping();
       return message.reply(
-        "I'd play you Lonely. but i cant, so here's the song link for you https://www.youtube.com/watch?v=djU4Lq_5EaM"
+        "I'd play you Lonely. but i cant, so here's the song link https://www.youtube.com/watch?v=djU4Lq_5EaM"
       );
     }
 
-    if (userMessage.includes("play valo") || userMessage.includes("play valorant")) {
+    if (userMessage.includes("play valo")) {
       await message.channel.sendTyping();
       return message.reply("Hatt 💀");
     }
@@ -193,7 +226,7 @@ client.on('messageCreate', async (message) => {
     return message.reply(fallback[Math.floor(Math.random() * fallback.length)]);
   }
 
-  // ================= RANDOM CHAT =================
+  // RANDOM CHAT
   if (Math.random() < 0.2) {
     const msg = message.content.toLowerCase();
 
@@ -209,5 +242,4 @@ client.on('messageCreate', async (message) => {
   }
 });
 
-// START
 client.login(process.env.DISCORD_TOKEN);
