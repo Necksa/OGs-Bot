@@ -911,7 +911,7 @@ if (
       replies[Math.floor(Math.random() * replies.length)]
     );
   }
-}
+});
 
 // ============================================================
 // LOGIN
