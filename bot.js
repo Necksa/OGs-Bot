@@ -907,10 +907,12 @@ if (
 
     await message.channel.sendTyping();
 
-    return message.reply(
-      replies[Math.floor(Math.random() * replies.length)]
-    );
+ return message.reply(
+  replies[Math.floor(Math.random() * replies.length)]
+);
   }
+}
+
 });
 
 // ============================================================
