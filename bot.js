@@ -197,10 +197,28 @@ client.on('guildMemberAdd', async (member) => {
 // ============================================================
 // MAIN MESSAGE EVENT
 // ============================================================
+// ============================================================
+// PASSIVE CHAT SYSTEM
+// ============================================================
 
+let lastPassiveReply = 0;
+
+const PASSIVE_COOLDOWN = 5000; // 5 sec
 client.on('messageCreate', async (message) => {
 
   if (message.author.bot) return;
+  // ============================================================
+// PASSIVE REPLY CHANCE
+// ============================================================
+
+const now = Date.now();
+
+const passiveAllowed =
+  now - lastPassiveReply > PASSIVE_COOLDOWN;
+
+const shouldPassiveReply =
+  passiveAllowed &&
+  Math.random() < 0.08;
 
   const userId = message.author.id;
   const msg = message.content.toLowerCase();
@@ -753,30 +771,147 @@ ${fallback}
   // RANDOM CHAT
   // ============================================================
 
-  if (Math.random() < 0.15) {
+ // ============================================================
+// PASSIVE CONVERSATION ENGINE V2
+// ============================================================
 
-    if (msg.includes('bored')) {
+if (
+  shouldPassiveReply &&
+  !message.mentions.has(client.user)
+) {
 
-      await message.channel.sendTyping();
+  // VALO / RR
+  if (
+    msg.includes('rr') ||
+    msg.includes('valo') ||
+    msg.includes('ranked')
+  ) {
 
-      return message.reply('same honestly 😭');
-    }
+    const replies = [
+      'ranked was invented by demons 😭',
+      'someone losing mental today',
+      'RR disappearing incident',
+      'bottom frag incoming 💀',
+      'queueing valo is self harm ngl'
+    ];
 
-    if (msg.includes('game')) {
+    lastPassiveReply = now;
 
-      await message.channel.sendTyping();
+    await message.channel.sendTyping();
 
-      return message.reply('someone losing rank today 💀');
-    }
-
-    if (msg.includes('valo')) {
-
-      await message.channel.sendTyping();
-
-      return message.reply('RR about to disappear 😭');
-    }
+    return message.reply(
+      replies[Math.floor(Math.random() * replies.length)]
+    );
   }
-});
+
+  // SKILL ISSUE
+  if (
+    msg.includes('skill issue')
+  ) {
+
+    const replies = [
+      'emotional damage 😭',
+      'that sentence ruins friendships',
+      'bro got humbled instantly',
+      'recovery not possible after that'
+    ];
+
+    lastPassiveReply = now;
+
+    await message.channel.sendTyping();
+
+    return message.reply(
+      replies[Math.floor(Math.random() * replies.length)]
+    );
+  }
+
+  // GG / NT
+  if (
+    msg.includes('gg') ||
+    msg.includes('nt')
+  ) {
+
+    const replies = [
+      'it was NOT nt 😭',
+      'respectfully that was tragic',
+      'gg go next',
+      'pain.'
+    ];
+
+    lastPassiveReply = now;
+
+    await message.channel.sendTyping();
+
+    return message.reply(
+      replies[Math.floor(Math.random() * replies.length)]
+    );
+  }
+
+  // QUEUE
+  if (
+    msg.includes('who queue') ||
+    msg.includes('queue?') ||
+    msg.includes('valo anyone')
+  ) {
+
+    const replies = [
+      'someone about to lose RR 😭',
+      'friendship ending session starting',
+      'ranked demons assembling',
+      'mental health leaving the server'
+    ];
+
+    lastPassiveReply = now;
+
+    await message.channel.sendTyping();
+
+    return message.reply(
+      replies[Math.floor(Math.random() * replies.length)]
+    );
+  }
+
+  // BORED
+  if (
+    msg.includes('bored')
+  ) {
+
+    const replies = [
+      'same honestly 😭',
+      'peak boredom activities',
+      'someone start a game',
+      'server dead af'
+    ];
+
+    lastPassiveReply = now;
+
+    await message.channel.sendTyping();
+
+    return message.reply(
+      replies[Math.floor(Math.random() * replies.length)]
+    );
+  }
+
+  // SUS
+  if (
+    msg.includes('sus')
+  ) {
+
+    const replies = [
+      'bro is NOT innocent 💀',
+      'venting activities detected',
+      'emergency meeting 😭',
+      'highly suspicious behavior'
+    ];
+
+    lastPassiveReply = now;
+
+    await message.channel.sendTyping();
+
+    return message.reply(
+      replies[Math.floor(Math.random() * replies.length)]
+    );
+  }
+}
 
 // ============================================================
 // LOGIN
