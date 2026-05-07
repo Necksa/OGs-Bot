@@ -1,5 +1,5 @@
 // ============================================================
-// OGS BOT - PERSONALITY ENGINE VERSION
+// OGS BOT - FIXED PERSONALITY ENGINE VERSION
 // ============================================================
 
 const {
@@ -27,6 +27,17 @@ const PREFIX = '!';
 const WELCOME_CHANNEL_NAME = 'welcome';
 const AUTO_ROLE_NAME = 'Member';
 const BUMP_CHANNEL_NAME = 'server-bump';
+
+// ============================================================
+// OWNER CONFIG
+// ============================================================
+
+const OWNER_ID = '613760928671989762';
+
+const OWNER_VALO_NAMES = [
+  'necksa',
+  'lsdxnecksa'
+];
 
 // ============================================================
 // MEMORY + STATS
@@ -275,6 +286,24 @@ Commands:
         return message.reply('Tag someone to roast 😭');
       }
 
+      // OWNER PROTECTION
+      if (target.id === OWNER_ID) {
+
+        const ownerReplies = [
+          'nah 😭 that’s my creator',
+          'i cannot roast my father',
+          'bro tried roasting the admin 💀',
+          'respect the creator 😭',
+          'that man built me'
+        ];
+
+        return message.reply(
+          ownerReplies[
+            Math.floor(Math.random() * ownerReplies.length)
+          ]
+        );
+      }
+
       if (target.id === message.author.id) {
         return message.reply('You want me to roast yourself? Respect 💀');
       }
@@ -304,6 +333,22 @@ Commands:
 
       name = name.toLowerCase();
       tag = tag.toLowerCase();
+
+      // OWNER SPECIAL VALO
+      if (OWNER_VALO_NAMES.includes(name)) {
+
+        return message.reply(`
+🎮 ${name}#${tag}
+
+Playstyle:
+best player alive 😭
+
+Analysis:
+my creator.
+my father.
+ranked fears him.
+`);
+      }
 
       try {
 
@@ -359,6 +404,29 @@ ${fallback}
       .replace(`<@!${client.user.id}>`, '')
       .trim()
       .toLowerCase();
+
+    // OWNER SPECIAL REPLIES
+    if (message.author.id === OWNER_ID) {
+
+      const ownerReplies = [
+        'yo creator 😭',
+        'my father has arrived',
+        'respectfully speaking, best player alive',
+        'hello bossman 😎',
+        'ranked demon detected'
+      ];
+
+      if (Math.random() < 0.4) {
+
+        await message.channel.sendTyping();
+
+        return message.reply(
+          ownerReplies[
+            Math.floor(Math.random() * ownerReplies.length)
+          ]
+        );
+      }
+    }
 
     // MEMORY
     if (!memory.has(userId)) {
