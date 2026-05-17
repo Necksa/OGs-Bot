@@ -483,7 +483,50 @@ ${fallback}
       );
     }
   }
+// ============================================================
+// MANUAL SUSHI PIC COMMAND
+// ============================================================
 
+if (
+  message.mentions.has(client.user) &&
+  msg.includes('send pic')
+) {
+
+  try {
+
+    const files =
+      fs.readdirSync('./photos');
+
+    console.log(files);
+
+    if (!files.length) {
+      return message.reply('no pics found 😭');
+    }
+
+    const randomImage =
+      files[Math.floor(Math.random() * files.length)];
+
+    const imagePath =
+      `./photos/${randomImage}`;
+
+    await message.channel.sendTyping();
+
+    await new Promise(resolve =>
+      setTimeout(resolve, 1500)
+    );
+
+    await message.reply({
+      content: '😭',
+      files: [imagePath]
+    });
+
+  } catch (err) {
+
+    console.log(err);
+
+    message.reply('something broke 😭');
+  }
+}
   // ============================================================
   // RANDOM SUSHI PHOTO REPLIES
   // ============================================================
