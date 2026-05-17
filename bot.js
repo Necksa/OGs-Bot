@@ -26,12 +26,12 @@ const client = new Client({
   ]
 });
 
-// ===========================================================
+// ============================================================
 // CONFIG
 // ============================================================
 
 const PREFIX = '!';
-const WELCOME_CHANNEL_NAME = '👋・welcome';
+const WELCOME_CHANNEL_NAME = 'welcome';
 const AUTO_ROLE_NAME = 'Member';
 const BUMP_CHANNEL_NAME = 'server-bump';
 
@@ -81,7 +81,6 @@ const PHOTO_REPLY_COOLDOWN = 5000;
 
 const memory = new Map();
 const stats = {};
-const friendship = {};
 
 // ============================================================
 // DATA
@@ -169,7 +168,11 @@ client.on('guildMemberAdd', async (member) => {
       await member.roles.add(role);
     }
 
-  } catch {}
+  } catch (err) {
+
+    console.log(err);
+
+  }
 
   const channel = member.guild.channels.cache.find(
     c => c.name === WELCOME_CHANNEL_NAME
@@ -178,11 +181,35 @@ client.on('guildMemberAdd', async (member) => {
   if (!channel) return;
 
   const embed = new EmbedBuilder()
-    .setTitle(`👋 Welcome to ${member.guild.name}!`)
-    .setDescription(`Hey ${member}, welcome to the chaos 😭`)
+
+    .setAuthor({
+      name: 'OGs eSports',
+      iconURL: member.guild.iconURL({ dynamic: true })
+    })
+
+    .setTitle('Welcome!')
+
+    .setDescription(
+`✧ Welcome to the Epicness ${member}
+
+✧ You Are Our ${member.guild.memberCount}th Member!
+
+✧ Chat & Make Friends In <#732282717831430254>
+
+✧ Read Rules Carefully In <#732281800092811376> And Follow Them!
+
+✧ Play Games & Have Fun With Your Friends!`
+    )
+
+    .setThumbnail(
+      member.user.displayAvatarURL({ dynamic: true })
+    )
+
     .setColor(0x5865F2);
 
-  channel.send({ embeds: [embed] });
+  channel.send({
+    embeds: [embed]
+  });
 
 });
 
@@ -294,8 +321,6 @@ Commands:
 !valo
 !roast
 !ticketpanel
-!pet
-!friendship
       `);
     }
 
@@ -321,130 +346,22 @@ Commands:
 
     // STATS
 
-// STATS
+    if (command === 'stats') {
 
-if (command === 'stats') {
+      const sorted = Object.entries(stats)
+        .sort((a, b) => b[1].messages - a[1].messages);
 
-  const sorted = Object.entries(stats)
-    .sort((a, b) => b[1].messages - a[1].messages);
+      if (!sorted.length) {
+        return message.reply('No data yet.');
+      }
 
-  if (!sorted.length) {
-    return message.reply('No data yet.');
-  }
+      const topUser = sorted[0];
 
-  const topUser = sorted[0];
+      return message.reply(
+        `📊 Top chatter: <@${topUser[0]}> with ${topUser[1].messages} messages`
+      );
+    }
 
-  return message.reply(
-    `📊 Top chatter: <@${topUser[0]}> with ${topUser[1].messages} messages`
-  );
-}
-
-// PET COMMAND
-
-if (command === 'pet') {
-
-  if (!friendship[userId]) {
-    friendship[userId] = 0;
-  }
-
-  const gain =
-    Math.floor(Math.random() * 4) + 1;
-
-  friendship[userId] += gain;
-
-  const petResponses = [
-
-    '🐶 Sushi wagged her tail happily',
-
-    '😭 Sushi rolled over for belly rubs',
-
-    '🐾 Sushi zoomies activated',
-
-    '🐶 Sushi fell asleep on you',
-
-    '💀 Sushi bit your hand playfully',
-
-    '🐶 Sushi licked your face',
-
-    '😭 Sushi demanded more pets',
-
-    '🐾 Sushi brought you a random stick',
-
-    '💀 Sushi stole your food and ran away',
-
-    '🐶 Sushi climbed onto your lap'
-  ];
-
-  const response =
-    petResponses[
-      Math.floor(Math.random() * petResponses.length)
-    ];
-
-  let rank = 'Stranger';
-
-  const points = friendship[userId];
-
-  if (points > 20) rank = 'Friend';
-  if (points > 50) rank = 'Bestie';
-  if (points > 100) rank = 'Pack Member';
-  if (points > 200) rank = 'Favorite Human';
-
-  let rareEvent = '';
-
-  if (Math.random() < 0.03) {
-
-    const rareEvents = [
-
-      '\n✨ Sushi gave you a legendary belly rub',
-
-      '\n💎 Sushi considers you extra trustworthy today',
-
-      '\n😭 Sushi refuses to leave your side',
-
-      '\n🐶 Sushi brought you a rare gift'
-    ];
-
-    rareEvent =
-      rareEvents[
-        Math.floor(Math.random() * rareEvents.length)
-      ];
-
-    friendship[userId] += 10;
-  }
-
-  return message.reply(
-`${response}
-
-❤️ Friendship +${gain}
-
-🐶 Total Friendship: ${friendship[userId]}
-
-🏆 Rank: ${rank}${rareEvent}`
-  );
-}
-
-// FRIENDSHIP COMMAND
-
-if (command === 'friendship') {
-
-  const points =
-    friendship[userId] || 0;
-
-  let rank = 'Stranger';
-
-  if (points > 20) rank = 'Friend';
-  if (points > 50) rank = 'Bestie';
-  if (points > 100) rank = 'Pack Member';
-  if (points > 200) rank = 'Favorite Human';
-
-  return message.reply(
-`🐶 Sushi Friendship Stats
-
-❤️ Friendship: ${points}
-
-🏆 Rank: ${rank}`
-  );
-}
     // ROAST
 
     if (command === 'roast') {
@@ -649,10 +566,7 @@ if (
     photoAllowed &&
     Math.random() < 0.25;
 
-  if (
-  shouldSendPhoto &&
-  !message.content.startsWith(PREFIX)
-) {
+  if (shouldSendPhoto) {
 
     try {
 
