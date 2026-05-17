@@ -649,7 +649,10 @@ if (
     photoAllowed &&
     Math.random() < 0.25;
 
-  if (shouldSendPhoto) {
+  if (
+  shouldSendPhoto &&
+  !message.content.startsWith(PREFIX)
+) {
 
     try {
 
