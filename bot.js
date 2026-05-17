@@ -536,7 +536,7 @@ if (
 
   const shouldSendPhoto =
     photoAllowed &&
-    true;
+    Math.random() < 0.25;
 
   if (shouldSendPhoto) {
 
