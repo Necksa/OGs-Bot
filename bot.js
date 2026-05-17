@@ -1,5 +1,5 @@
 // ============================================================
-// OGS BOT - FINAL VERSION WITH AUTO REGISTRATION TICKET MESSAGE
+// OGS BOT - UPGRADED SUSHI VERSION
 // ============================================================
 
 const {
@@ -14,6 +14,8 @@ const {
 } = require('discord.js');
 
 const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
 
 const client = new Client({
   intents: [
@@ -33,16 +35,47 @@ const WELCOME_CHANNEL_NAME = 'welcome';
 const AUTO_ROLE_NAME = 'Member';
 const BUMP_CHANNEL_NAME = 'server-bump';
 
-// ============================================================
-// OWNER CONFIG
-// ============================================================
-
 const OWNER_ID = '613760928671989762';
 
 const OWNER_VALO_NAMES = [
   'necksa',
   'lsdxnecksa'
 ];
+
+// ============================================================
+// ANTI SPAM CONFIG
+// ============================================================
+
+const FAMILY_ROLE_NAME = 'Family';
+
+const SPAM_LIMIT = 5;
+const SPAM_INTERVAL = 3000;
+const SPAM_TIMEOUT = 3 * 60 * 1000;
+
+const userMessages = new Map();
+
+// ============================================================
+// SUSHI PHOTO CONFIG
+// ============================================================
+
+const SUSHI_IMAGE_FOLDER = './photos';
+
+const sushiCaptions = [
+  'real 😭',
+  'nahhh',
+  'average general chat',
+  'bro what',
+  'me rn',
+  '😭',
+  'wild',
+  'i cant do this anymore',
+  'HELPPPP',
+  'insane behavior'
+];
+
+let lastPhotoReply = 0;
+
+const PHOTO_REPLY_COOLDOWN = 1000 * 60 * 5;
 
 // ============================================================
 // MEMORY + STATS
@@ -169,18 +202,62 @@ const PASSIVE_COOLDOWN = 5000;
 client.on('messageCreate', async (message) => {
 
   if (message.author.bot) return;
+  if (!message.guild) return;
+
+  const member = message.member;
 
   const now = Date.now();
 
-  const passiveAllowed =
-    now - lastPassiveReply > PASSIVE_COOLDOWN;
-
-  const shouldPassiveReply =
-    passiveAllowed &&
-    Math.random() < 0.08;
-
   const userId = message.author.id;
+
   const msg = message.content.toLowerCase();
+
+  // ============================================================
+  // ANTI SPAM SYSTEM
+  // ============================================================
+
+  if (!member.roles.cache.some(
+    role => role.name === FAMILY_ROLE_NAME
+  )) {
+
+    if (!userMessages.has(userId)) {
+      userMessages.set(userId, []);
+    }
+
+    let timestamps = userMessages.get(userId);
+
+    timestamps = timestamps.filter(
+      t => now - t < SPAM_INTERVAL
+    );
+
+    timestamps.push(now);
+
+    userMessages.set(userId, timestamps);
+
+    if (timestamps.length >= SPAM_LIMIT) {
+
+      try {
+
+        await member.timeout(
+          SPAM_TIMEOUT,
+          'Spam detected'
+        );
+
+        await message.channel.send(
+          `${message.author} got timed out for spamming 😭`
+        );
+
+        userMessages.delete(userId);
+
+      } catch (err) {
+
+        console.log(err);
+
+      }
+
+      return;
+    }
+  }
 
   // ============================================================
   // STATS
@@ -349,19 +426,11 @@ ${fallback}
     if (command === 'ticketpanel') {
 
       const embed = new EmbedBuilder()
-  .setTitle('🎫 Brawlers Ticket Panel')
-  .setDescription(
-
-`Choose a reason for opening a ticket:
-
-• Tournament Registration
-• Support
-• Player Reports
-
-Click the button below to create a ticket.`
-
-  )
-  .setColor(0x5865F2);
+        .setTitle('🎫 Brawlers Support')
+        .setDescription(
+          'Click the button below to create a support ticket.'
+        )
+        .setColor(0x5865F2);
 
       const row = new ActionRowBuilder()
         .addComponents(
@@ -385,6 +454,13 @@ Click the button below to create a ticket.`
   // PASSIVE REPLIES
   // ============================================================
 
+  const passiveAllowed =
+    now - lastPassiveReply > PASSIVE_COOLDOWN;
+
+  const shouldPassiveReply =
+    passiveAllowed &&
+    Math.random() < 0.08;
+
   if (
     shouldPassiveReply &&
     !message.mentions.has(client.user)
@@ -407,6 +483,57 @@ Click the button below to create a ticket.`
       return message.reply(
         replies[Math.floor(Math.random() * replies.length)]
       );
+    }
+  }
+
+  // ============================================================
+  // RANDOM SUSHI PHOTO REPLIES
+  // ============================================================
+
+  const photoAllowed =
+    now - lastPhotoReply > PHOTO_REPLY_COOLDOWN;
+
+  const shouldSendPhoto =
+    photoAllowed &&
+    Math.random() < 0.03;
+
+  if (shouldSendPhoto) {
+
+    try {
+
+      await message.channel.sendTyping();
+
+      setTimeout(async () => {
+
+        const files =
+          fs.readdirSync(SUSHI_IMAGE_FOLDER);
+
+        if (!files.length) return;
+
+        const randomImage =
+          files[Math.floor(Math.random() * files.length)];
+
+        const imagePath =
+          path.join(SUSHI_IMAGE_FOLDER, randomImage);
+
+        const caption =
+          sushiCaptions[
+            Math.floor(Math.random() * sushiCaptions.length)
+          ];
+
+        await message.reply({
+          content: caption,
+          files: [imagePath]
+        });
+
+      }, 2000 + Math.random() * 4000);
+
+      lastPhotoReply = now;
+
+    } catch (err) {
+
+      console.log(err);
+
     }
   }
 
@@ -481,10 +608,6 @@ client.on('interactionCreate', async (interaction) => {
 
     });
 
-    // ============================================================
-    // CLOSE BUTTON
-    // ============================================================
-
     const row = new ActionRowBuilder()
       .addComponents(
 
@@ -496,36 +619,22 @@ client.on('interactionCreate', async (interaction) => {
 
       );
 
-    // ============================================================
-    // AUTO REGISTRATION MESSAGE
-    // ============================================================
-
     const embed = new EmbedBuilder()
       .setTitle('🍣 Sushi • Brawlers Registration')
       .setDescription(
-
 `If you're here for the 🎮 Brawlers Tournament Registration, please complete all the steps below carefully:
 
 1️⃣ Join our Discord server.
 
-2️⃣ Follow BOTH Instagram pages:
-
-• @_ggwp.rip_
-https://www.instagram.com/_ggwp.rip_?igsh=eGc0NTk1ZXJsajZx
-
-• @ogs.igc
-https://www.instagram.com/ogs.igc?igsh=MWphOHVjb2FlemM4NQ==
+2️⃣ Follow BOTH Instagram pages.
 
 3️⃣ All 5 team members must also follow BOTH Instagram pages.
 
-4️⃣ Send screenshots as proof showing that all 5 members have followed both accounts.
+4️⃣ Send screenshots as proof.
 
-5️⃣ After completing all the steps, send us your Team Name.
+5️⃣ Send your Team Name.
 
-Once verification is completed, your team will be officially registered for the tournament ✅
-
-Good luck and have fun competing 🔥`
-
+Once verified, your team will be officially registered ✅`
       )
       .setColor(0x5865F2);
 
