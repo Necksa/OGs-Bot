@@ -81,6 +81,7 @@ const PHOTO_REPLY_COOLDOWN = 5000;
 
 const memory = new Map();
 const stats = {};
+const friendship = {};
 
 // ============================================================
 // DATA
@@ -293,6 +294,8 @@ Commands:
 !valo
 !roast
 !ticketpanel
+!pet
+!friendship
       `);
     }
 
@@ -319,6 +322,114 @@ Commands:
     // STATS
 
     if (command === 'stats') {
+      // PET COMMAND
+
+if (command === 'pet') {
+
+  if (!friendship[userId]) {
+    friendship[userId] = 0;
+  }
+
+  const gain =
+    Math.floor(Math.random() * 4) + 1;
+
+  friendship[userId] += gain;
+
+  const petResponses = [
+
+    '🐶 Sushi wagged her tail happily',
+
+    '😭 Sushi rolled over for belly rubs',
+
+    '🐾 Sushi zoomies activated',
+
+    '🐶 Sushi fell asleep on you',
+
+    '💀 Sushi bit your hand playfully',
+
+    '🐶 Sushi licked your face',
+
+    '😭 Sushi demanded more pets',
+
+    '🐾 Sushi brought you a random stick',
+
+    '💀 Sushi stole your food and ran away',
+
+    '🐶 Sushi climbed onto your lap'
+  ];
+
+  const response =
+    petResponses[
+      Math.floor(Math.random() * petResponses.length)
+    ];
+
+  let rank = 'Stranger';
+
+  const points = friendship[userId];
+
+  if (points > 20) rank = 'Friend';
+  if (points > 50) rank = 'Bestie';
+  if (points > 100) rank = 'Pack Member';
+  if (points > 200) rank = 'Favorite Human';
+
+  // Rare event
+
+  let rareEvent = '';
+
+  if (Math.random() < 0.03) {
+
+    const rareEvents = [
+
+      '\n✨ Sushi gave you a legendary belly rub',
+
+      '\n💎 Sushi considers you extra trustworthy today',
+
+      '\n😭 Sushi refuses to leave your side',
+
+      '\n🐶 Sushi brought you a rare gift'
+    ];
+
+    rareEvent =
+      rareEvents[
+        Math.floor(Math.random() * rareEvents.length)
+      ];
+
+    friendship[userId] += 10;
+  }
+
+  return message.reply(
+`${response}
+
+❤️ Friendship +${gain}
+
+🐶 Total Friendship: ${friendship[userId]}
+
+🏆 Rank: ${rank}${rareEvent}`
+  );
+}
+
+// FRIENDSHIP COMMAND
+
+if (command === 'friendship') {
+
+  const points =
+    friendship[userId] || 0;
+
+  let rank = 'Stranger';
+
+  if (points > 20) rank = 'Friend';
+  if (points > 50) rank = 'Bestie';
+  if (points > 100) rank = 'Pack Member';
+  if (points > 200) rank = 'Favorite Human';
+
+  return message.reply(
+`🐶 Sushi Friendship Stats
+
+❤️ Friendship: ${points}
+
+🏆 Rank: ${rank}`
+  );
+}
 
       const sorted = Object.entries(stats)
         .sort((a, b) => b[1].messages - a[1].messages);
