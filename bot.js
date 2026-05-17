@@ -1,4 +1,4 @@
-// ===========================================================
+// ============================================================
 // OGS BOT - FINAL WORKING SUSHI VERSION
 // ============================================================
 
@@ -31,7 +31,7 @@ const client = new Client({
 // ============================================================
 
 const PREFIX = '!';
-const WELCOME_CHANNEL_NAME = 'welcome';
+const WELCOME_CHANNEL_NAME = '👋・welcome';
 const AUTO_ROLE_NAME = 'Member';
 const BUMP_CHANNEL_NAME = 'server-bump';
 
