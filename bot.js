@@ -493,7 +493,7 @@ ${fallback}
 
   const shouldSendPhoto =
     photoAllowed &&
-    Math.random() < 0.6;
+    true;
 
   if (shouldSendPhoto) {
 
