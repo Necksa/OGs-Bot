@@ -1,6 +1,8 @@
 // ============================================================
-// OGS BOT - UPGRADED SUSHI VERSION
+// OGS BOT - FINAL WORKING SUSHI VERSION
 // ============================================================
+
+require('dotenv').config();
 
 const {
   Client,
@@ -15,7 +17,6 @@ const {
 
 const axios = require('axios');
 const fs = require('fs');
-const path = require('path');
 
 const client = new Client({
   intents: [
@@ -57,8 +58,6 @@ const userMessages = new Map();
 // ============================================================
 // SUSHI PHOTO CONFIG
 // ============================================================
-
-const SUSHI_IMAGE_FOLDER = './photos';
 
 const sushiCaptions = [
   'real 😭',
@@ -286,7 +285,7 @@ client.on('messageCreate', async (message) => {
 
     if (command === 'help') {
 
-      message.reply(`
+      return message.reply(`
 Commands:
 !help
 !joke
@@ -480,7 +479,7 @@ ${fallback}
 
       lastPassiveReply = now;
 
-      return message.reply(
+      message.reply(
         replies[Math.floor(Math.random() * replies.length)]
       );
     }
@@ -495,39 +494,42 @@ ${fallback}
 
   const shouldSendPhoto =
     photoAllowed &&
-    true;
+    Math.random() < 0.6;
 
   if (shouldSendPhoto) {
 
     try {
 
+      const files =
+        fs.readdirSync('./photos');
+
+      console.log(files);
+
+      if (!files.length) return;
+
+      const randomImage =
+        files[Math.floor(Math.random() * files.length)];
+
+      const imagePath =
+        `./photos/${randomImage}`;
+
+      const caption =
+        sushiCaptions[
+          Math.floor(Math.random() * sushiCaptions.length)
+        ];
+
       await message.channel.sendTyping();
 
-      setTimeout(async () => {
+      await new Promise(resolve =>
+        setTimeout(resolve, 2000)
+      );
 
-        const files =
-          fs.readdirSync(SUSHI_IMAGE_FOLDER);
+      await message.reply({
+        content: caption,
+        files: [imagePath]
+      });
 
-        if (!files.length) return;
-
-        console.log(files);
-        const randomImage =
-          files[Math.floor(Math.random() * files.length)];
-
-        const imagePath =
-          path.join(SUSHI_IMAGE_FOLDER, randomImage);
-
-        const caption =
-          sushiCaptions[
-            Math.floor(Math.random() * sushiCaptions.length)
-          ];
-
-        await message.reply({
-          content: caption,
-          files: [imagePath]
-        });
-
-      }, 2000 + Math.random() * 4000);
+      console.log('IMAGE SENT');
 
       lastPhotoReply = now;
 
@@ -626,13 +628,9 @@ client.on('interactionCreate', async (interaction) => {
 `If you're here for the 🎮 Brawlers Tournament Registration, please complete all the steps below carefully:
 
 1️⃣ Join our Discord server.
-
 2️⃣ Follow BOTH Instagram pages.
-
 3️⃣ All 5 team members must also follow BOTH Instagram pages.
-
 4️⃣ Send screenshots as proof.
-
 5️⃣ Send your Team Name.
 
 Once verified, your team will be officially registered ✅`
