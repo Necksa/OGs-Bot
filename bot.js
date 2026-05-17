@@ -352,10 +352,9 @@ ${fallback}
         .setTitle('🎫 Brawlers Support')
         .setDescription(
           'Click the button below to create a support ticket.\n\n' +
-          '• Tournament Support\n' +
-          '• Prize Claims\n' +
-          '• Player Reports\n' +
-          '• Partnerships'
+          '• Tournament registration\n' +
+          '• Tournament details\n' +
+          '• Player Reports'
         )
         .setColor(0x5865F2);
 
