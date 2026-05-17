@@ -2,7 +2,6 @@
 // OGS BOT - FINAL WORKING SUSHI VERSION
 // ============================================================
 
-require('dotenv').config();
 
 const {
   Client,
