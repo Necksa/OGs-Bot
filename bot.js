@@ -321,8 +321,25 @@ Commands:
 
     // STATS
 
-    if (command === 'stats') {
-      // PET COMMAND
+// STATS
+
+if (command === 'stats') {
+
+  const sorted = Object.entries(stats)
+    .sort((a, b) => b[1].messages - a[1].messages);
+
+  if (!sorted.length) {
+    return message.reply('No data yet.');
+  }
+
+  const topUser = sorted[0];
+
+  return message.reply(
+    `📊 Top chatter: <@${topUser[0]}> with ${topUser[1].messages} messages`
+  );
+}
+
+// PET COMMAND
 
 if (command === 'pet') {
 
@@ -371,8 +388,6 @@ if (command === 'pet') {
   if (points > 50) rank = 'Bestie';
   if (points > 100) rank = 'Pack Member';
   if (points > 200) rank = 'Favorite Human';
-
-  // Rare event
 
   let rareEvent = '';
 
@@ -430,21 +445,6 @@ if (command === 'friendship') {
 🏆 Rank: ${rank}`
   );
 }
-
-      const sorted = Object.entries(stats)
-        .sort((a, b) => b[1].messages - a[1].messages);
-
-      if (!sorted.length) {
-        return message.reply('No data yet.');
-      }
-
-      const topUser = sorted[0];
-
-      return message.reply(
-        `📊 Top chatter: <@${topUser[0]}> with ${topUser[1].messages} messages`
-      );
-    }
-
     // ROAST
 
     if (command === 'roast') {
