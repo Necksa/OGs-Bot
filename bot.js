@@ -349,11 +349,19 @@ ${fallback}
     if (command === 'ticketpanel') {
 
       const embed = new EmbedBuilder()
-        .setTitle('🎫 Brawlers Support')
-        .setDescription(
-          'Click the button below to create a support ticket.'
-        )
-        .setColor(0x5865F2);
+  .setTitle('🎫 Brawlers Ticket Panel')
+  .setDescription(
+
+`Choose a reason for opening a ticket:
+
+• Tournament Registration
+• Support
+• Player Reports
+
+Click the button below to create a ticket.`
+
+  )
+  .setColor(0x5865F2);
 
       const row = new ActionRowBuilder()
         .addComponents(
