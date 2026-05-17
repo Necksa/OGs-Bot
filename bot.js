@@ -26,12 +26,12 @@ const client = new Client({
   ]
 });
 
-// ============================================================
+// ===========================================================
 // CONFIG
 // ============================================================
 
 const PREFIX = '!';
-const WELCOME_CHANNEL_NAME = 'welcome';
+const WELCOME_CHANNEL_NAME = '👋・welcome';
 const AUTO_ROLE_NAME = 'Member';
 const BUMP_CHANNEL_NAME = 'server-bump';
 
@@ -81,6 +81,7 @@ const PHOTO_REPLY_COOLDOWN = 5000;
 
 const memory = new Map();
 const stats = {};
+const friendship = {};
 
 // ============================================================
 // DATA
@@ -168,11 +169,7 @@ client.on('guildMemberAdd', async (member) => {
       await member.roles.add(role);
     }
 
-  } catch (err) {
-
-    console.log(err);
-
-  }
+  } catch {}
 
   const channel = member.guild.channels.cache.find(
     c => c.name === WELCOME_CHANNEL_NAME
@@ -181,35 +178,11 @@ client.on('guildMemberAdd', async (member) => {
   if (!channel) return;
 
   const embed = new EmbedBuilder()
-
-    .setAuthor({
-      name: 'OGs eSports',
-      iconURL: member.guild.iconURL({ dynamic: true })
-    })
-
-    .setTitle('Welcome!')
-
-    .setDescription(
-`✧ Welcome to the Epicness ${member}
-
-✧ You Are Our ${member.guild.memberCount}th Member!
-
-✧ Chat & Make Friends In <#732282717831430254>
-
-✧ Read Rules Carefully In <#732281800092811376> And Follow Them!
-
-✧ Play Games & Have Fun With Your Friends!`
-    )
-
-    .setThumbnail(
-      member.user.displayAvatarURL({ dynamic: true })
-    )
-
+    .setTitle(`👋 Welcome to ${member.guild.name}!`)
+    .setDescription(`Hey ${member}, welcome to the chaos 😭`)
     .setColor(0x5865F2);
 
-  channel.send({
-    embeds: [embed]
-  });
+  channel.send({ embeds: [embed] });
 
 });
 
@@ -321,6 +294,8 @@ Commands:
 !valo
 !roast
 !ticketpanel
+!pet
+!friendship
       `);
     }
 
@@ -346,7 +321,7 @@ Commands:
 
     // STATS
 
-    // STATS
+// STATS
 
 if (command === 'stats') {
 
@@ -470,7 +445,6 @@ if (command === 'friendship') {
 🏆 Rank: ${rank}`
   );
 }
-
     // ROAST
 
     if (command === 'roast') {
@@ -675,7 +649,10 @@ if (
     photoAllowed &&
     Math.random() < 0.25;
 
-  if (shouldSendPhoto) {
+  if (
+  shouldSendPhoto &&
+  !message.content.startsWith(PREFIX)
+) {
 
     try {
 
