@@ -286,7 +286,7 @@ client.on('messageCreate', async (message) => {
 
     if (command === 'help') {
 
-      return message.reply(`
+      message.reply(`
 Commands:
 !help
 !joke
@@ -495,7 +495,7 @@ ${fallback}
 
   const shouldSendPhoto =
     photoAllowed &&
-    Math.random() < 0.6;
+    true;
 
   if (shouldSendPhoto) {
 
