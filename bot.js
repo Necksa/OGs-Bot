@@ -75,7 +75,7 @@ const sushiCaptions = [
 
 let lastPhotoReply = 0;
 
-const PHOTO_REPLY_COOLDOWN = 1000 * 60 * 5;
+const PHOTO_REPLY_COOLDOWN = 5000;
 
 // ============================================================
 // MEMORY + STATS
@@ -495,7 +495,7 @@ ${fallback}
 
   const shouldSendPhoto =
     photoAllowed &&
-    Math.random() < 0.03;
+    Math.random() < 0.6;
 
   if (shouldSendPhoto) {
 
