@@ -510,6 +510,7 @@ ${fallback}
 
         if (!files.length) return;
 
+        console.log(files);
         const randomImage =
           files[Math.floor(Math.random() * files.length)];
 
