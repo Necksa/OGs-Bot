@@ -486,21 +486,43 @@ client.on('interactionCreate', async (interaction) => {
       );
 
     const embed = new EmbedBuilder()
-      .setTitle('🎫 Ticket Created')
-      .setDescription(
-        `Welcome ${interaction.user}!\n\n` +
-        `Please explain your issue.\n` +
-        `Support will assist you shortly.`
-      )
-      .setColor(0x5865F2);
+  .setTitle('🍣 Sushi • Brawlers Registration')
+  .setDescription(
 
-    await channel.send({
+`If you're here for the 🎮 Brawlers Tournament Registration, please complete all the steps below carefully:
 
-      content: `${interaction.user}`,
+1️⃣ Join our Discord server.
 
-      embeds: [embed],
+2️⃣ Follow BOTH Instagram pages:
 
-      components: [row]
+• @_ggwp.rip_
+https://www.instagram.com/_ggwp.rip_?igsh=eGc0NTk1ZXJsajZx
+
+• @ogs.igc
+https://www.instagram.com/ogs.igc?igsh=MWphOHVjb2FlemM4NQ==
+
+3️⃣ All 5 team members must also follow BOTH Instagram pages.
+
+4️⃣ Send screenshots as proof showing that all 5 members have followed both accounts.
+
+5️⃣ After completing all the steps, send us your Team Name.
+
+Once verification is completed, your team will be officially registered for the tournament ✅
+
+Good luck and have fun competing 🔥`
+
+  )
+  .setColor(0x5865F2);
+
+await channel.send({
+
+  content: `${interaction.user}`,
+
+  embeds: [embed],
+
+  components: [row]
+
+});
 
     });
 
