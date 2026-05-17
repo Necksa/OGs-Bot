@@ -1,5 +1,5 @@
 // ============================================================
-// OGS BOT - FIXED PERSONALITY ENGINE VERSION
+// OGS BOT - FINAL VERSION WITH AUTO REGISTRATION TICKET MESSAGE
 // ============================================================
 
 const {
@@ -351,10 +351,7 @@ ${fallback}
       const embed = new EmbedBuilder()
         .setTitle('🎫 Brawlers Support')
         .setDescription(
-          'Click the button below to create a support ticket.\n\n' +
-          '• Tournament registration\n' +
-          '• Tournament details\n' +
-          '• Player Reports'
+          'Click the button below to create a support ticket.'
         )
         .setColor(0x5865F2);
 
@@ -415,7 +412,9 @@ client.on('interactionCreate', async (interaction) => {
 
   if (!interaction.isButton()) return;
 
+  // ============================================================
   // CREATE TICKET
+  // ============================================================
 
   if (interaction.customId === 'create_ticket') {
 
@@ -474,6 +473,10 @@ client.on('interactionCreate', async (interaction) => {
 
     });
 
+    // ============================================================
+    // CLOSE BUTTON
+    // ============================================================
+
     const row = new ActionRowBuilder()
       .addComponents(
 
@@ -485,9 +488,13 @@ client.on('interactionCreate', async (interaction) => {
 
       );
 
+    // ============================================================
+    // AUTO REGISTRATION MESSAGE
+    // ============================================================
+
     const embed = new EmbedBuilder()
-  .setTitle('🍣 Sushi • Brawlers Registration')
-  .setDescription(
+      .setTitle('🍣 Sushi • Brawlers Registration')
+      .setDescription(
 
 `If you're here for the 🎮 Brawlers Tournament Registration, please complete all the steps below carefully:
 
@@ -511,18 +518,16 @@ Once verification is completed, your team will be officially registered for the 
 
 Good luck and have fun competing 🔥`
 
-  )
-  .setColor(0x5865F2);
+      )
+      .setColor(0x5865F2);
 
-await channel.send({
+    await channel.send({
 
-  content: `${interaction.user}`,
+      content: `${interaction.user}`,
 
-  embeds: [embed],
+      embeds: [embed],
 
-  components: [row]
-
-});
+      components: [row]
 
     });
 
@@ -535,7 +540,9 @@ await channel.send({
     });
   }
 
+  // ============================================================
   // CLOSE TICKET
+  // ============================================================
 
   if (interaction.customId === 'close_ticket') {
 
