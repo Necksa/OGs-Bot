@@ -73,7 +73,7 @@ const sushiCaptions = [
 
 let lastPhotoReply = 0;
 
-const PHOTO_REPLY_COOLDOWN = 5000;
+const PHOTO_REPLY_COOLDOWN = 1000 * 60 * 10;
 
 // ============================================================
 // MEMORY + STATS
