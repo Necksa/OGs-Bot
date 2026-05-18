@@ -815,6 +815,8 @@ client.on('interactionCreate', async (interaction) => {
 
 1️⃣ Join our Discord server.
 2️⃣ Follow BOTH Instagram pages.
+    @_ggwp.rip_
+    @ogs.igc
 3️⃣ All 5 team members must also follow BOTH Instagram pages.
 4️⃣ Send screenshots as proof.
 5️⃣ Send your Team Name.
