@@ -565,9 +565,9 @@ ${fallback}
     if (command === 'ticketpanel') {
 
       const embed = new EmbedBuilder()
-        .setTitle('🎫 Brawlers Support')
+        .setTitle('🎫 Brawlers Registration')
         .setDescription(
-          'Click the button below to create a support ticket.'
+          'Click the button below to register'
         )
         .setColor(0x5865F2);
 
