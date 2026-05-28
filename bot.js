@@ -1,31 +1,28 @@
 // ============================================================
-// OGS BOT - FINAL WORKING SUSHI VERSION + VCT VETO SYSTEM
+// OGS BOT - FULL VERSION + WORKING VETO SYSTEM
+// DISCORD.JS v13
 // ============================================================
+
+const Discord = require('discord.js');
 
 const {
 Client,
-GatewayIntentBits,
-EmbedBuilder,
-ActionRowBuilder,
-ButtonBuilder,
-ButtonStyle,
-PermissionsBitField,
-ChannelType,
-StringSelectMenuBuilder,
-SlashCommandBuilder,
-REST,
-Routes
-} = require('discord.js');
+Intents,
+MessageEmbed,
+MessageActionRow,
+MessageButton,
+MessageSelectMenu,
+Permissions
+} = Discord;
 
 const axios = require('axios');
 const fs = require('fs');
 
 const client = new Client({
 intents: [
-GatewayIntentBits.Guilds,
-GatewayIntentBits.GuildMembers,
-GatewayIntentBits.GuildMessages,
-GatewayIntentBits.MessageContent
+Intents.FLAGS.GUILDS,
+Intents.FLAGS.GUILD_MEMBERS,
+Intents.FLAGS.GUILD_MESSAGES
 ]
 });
 
@@ -34,6 +31,7 @@ GatewayIntentBits.MessageContent
 // ============================================================
 
 const PREFIX = '!';
+
 const WELCOME_CHANNEL_NAME = '👋・welcome';
 const AUTO_ROLE_NAME = 'Member';
 const BUMP_CHANNEL_NAME = 'server-bump';
@@ -46,10 +44,8 @@ const OWNER_VALO_NAMES = [
 ];
 
 // ============================================================
-// VETO SYSTEM
+// VETO CONFIG
 // ============================================================
-
-const activeVetos = new Map();
 
 const MAP_POOL = [
 'Ascent',
@@ -60,6 +56,8 @@ const MAP_POOL = [
 'Pearl',
 'Haven'
 ];
+
+const activeVetos = new Map();
 
 // ============================================================
 // ANTI SPAM CONFIG
@@ -92,7 +90,8 @@ const sushiCaptions = [
 
 let lastPhotoReply = 0;
 
-const PHOTO_REPLY_COOLDOWN = 1000 * 60 * 10;
+const PHOTO_REPLY_COOLDOWN =
+1000 * 60 * 10;
 
 // ============================================================
 // MEMORY + STATS
@@ -147,70 +146,38 @@ const roasts = [
 // READY
 // ============================================================
 
-client.once('ready', async () => {
+client.once('ready', () => {
 
 console.log(`✅ Logged in as ${client.user.tag}`);
 console.log('🔥 OGS BOT ONLINE');
 
-client.user.setActivity('watching the chaos 😭');
-
-// REGISTER SLASH COMMAND
-
-try {
-
-```
-const commands = [
-
-  new SlashCommandBuilder()
-
-    .setName('veto')
-
-    .setDescription(
-      'Start Valorant VCT Veto'
-    )
-
-    .toJSON()
-
-];
-
-const rest = new REST({
-  version: '10'
-}).setToken(process.env.DISCORD_TOKEN);
-
-await rest.put(
-  Routes.applicationCommands(client.user.id),
-  { body: commands }
+client.user.setActivity(
+'watching the chaos 😭'
 );
-
-console.log('✅ /veto registered');
-```
-
-} catch (err) {
-
-```
-console.log(err);
-```
-
-}
 
 // BUMP REMINDER
 
 setInterval(() => {
 
 ```
-client.guilds.cache.forEach(guild => {
+client.guilds.cache.forEach(
+  guild => {
 
-  const channel = guild.channels.cache.find(
-    c => c.name === BUMP_CHANNEL_NAME
-  );
+    const channel =
+      guild.channels.cache.find(
+        c =>
+          c.name ===
+          BUMP_CHANNEL_NAME
+      );
 
-  if (!channel) return;
+    if (!channel) return;
 
-  channel.send(
-    '⏰ Time to bump the server with `/bump` 😎'
-  );
+    channel.send(
+      '⏰ Time to bump the server with `/bump` 😎'
+    );
 
-});
+  }
+);
 ```
 
 }, 1000 * 60 * 60 * 2);
@@ -221,78 +188,77 @@ client.guilds.cache.forEach(guild => {
 // WELCOME SYSTEM
 // ============================================================
 
-client.on('guildMemberAdd', async (member) => {
+client.on(
+'guildMemberAdd',
+async member => {
 
+```
 try {
 
-```
-const role = member.guild.roles.cache.find(
-  r => r.name === AUTO_ROLE_NAME
-);
+  const role =
+    member.guild.roles.cache.find(
+      r =>
+        r.name ===
+        AUTO_ROLE_NAME
+    );
 
-if (role) {
-  await member.roles.add(role);
-}
-```
+  if (role) {
+
+    await member.roles.add(role);
+
+  }
 
 } catch (err) {
 
-```
-console.log(err);
-```
+  console.log(err);
 
 }
 
-const channel = member.guild.channels.cache.find(
-c => c.name === '👋・welcome'
-);
+const channel =
+  member.guild.channels.cache.find(
+    c =>
+      c.name ===
+      WELCOME_CHANNEL_NAME
+  );
 
 if (!channel) return;
 
-const embed = new EmbedBuilder()
+const embed =
+  new MessageEmbed()
 
-```
-.setAuthor({
-  name: 'OGs eSports',
-  iconURL: member.guild.iconURL({ dynamic: true })
-})
+    .setTitle('Welcome!')
 
-.setTitle('Welcome!')
-
-.setDescription(
+    .setDescription(
 ```
 
-`✧ Welcome to the Epicness ${member}
+`✧ Welcome ${member}
 
-✧ You Are Our ${member.guild.memberCount}th Member!
+✧ You are our ${member.guild.memberCount}th member!
 
-✧ Chat & Make Friends In <#732282717831430254>
-
-✧ Read Rules Carefully In <#732281800092811376>
-
-✧ Play Games & Have Fun!`
-)
+✧ Read rules and enjoy your stay 😎`
 
 ```
-.setThumbnail(
-  member.user.displayAvatarURL({ dynamic: true })
-)
+    )
 
-.setColor(0x5865F2);
-```
+    .setColor('#5865F2');
 
 channel.send({
-embeds: [embed]
+  embeds: [embed]
 });
+```
 
-});
+}
+);
 
 // ============================================================
 // MAIN MESSAGE EVENT
 // ============================================================
 
-client.on('messageCreate', async (message) => {
+client.on(
+'messageCreate',
+async message => {
 
+```
 if (message.author.bot) return;
 if (!message.guild) return;
 
@@ -300,56 +266,62 @@ const member = message.member;
 
 const now = Date.now();
 
-const userId = message.author.id;
+const userId =
+  message.author.id;
 
-const msg = message.content.toLowerCase();
+const msg =
+  message.content.toLowerCase();
 
 // ============================================================
-// VETO LEADER TAGGING
+// HANDLE VETO IGL TAGGING
 // ============================================================
 
-const veto =
-activeVetos.get(message.channel.id);
-
-if (
-veto &&
-veto.stage === 'leaders'
-) {
-
-```
-const mentions =
-  [...message.mentions.users.values()];
-
-if (mentions.length !== 2) {
-
-  return message.reply(
-    '❌ Tag exactly 2 IGLs.'
+const existingVeto =
+  activeVetos.get(
+    message.channel.id
   );
 
-}
+if (
+  existingVeto &&
+  existingVeto.stage ===
+    'leaders'
+) {
 
-veto.leaders = [
-  mentions[0],
-  mentions[1]
-];
+  const mentions =
+    [...message.mentions.users.values()];
 
-veto.stage = 'running';
+  if (mentions.length !== 2) {
 
-await message.channel.send(
+    return message.reply(
+      '❌ Tag EXACTLY 2 IGLs.'
+    );
+
+  }
+
+  existingVeto.leaders = [
+    mentions[0],
+    mentions[1]
+  ];
+
+  existingVeto.stage =
+    'running';
+
+  await message.channel.send(
 ```
 
-`🎮 ${mentions[0]} vs ${mentions[1]}
+`🎮 **Valorant VCT Veto Started**
+
+${mentions[0]} 🆚 ${mentions[1]}
 
 ❌ ${mentions[0]} bans first.`
 
 ```
-);
+  );
 
-return sendBanMenu(
-  message.channel,
-  veto
-);
-```
+  return sendBanMenu(
+    message.channel,
+    existingVeto
+  );
 
 }
 
@@ -357,321 +329,664 @@ return sendBanMenu(
 // ANTI SPAM
 // ============================================================
 
-if (!member.roles.cache.some(
-role => role.name === FAMILY_ROLE_NAME
-)) {
+if (
+  !member.roles.cache.some(
+    role =>
+      role.name ===
+      FAMILY_ROLE_NAME
+  )
+) {
 
-```
-if (!userMessages.has(userId)) {
-  userMessages.set(userId, []);
-}
+  if (
+    !userMessages.has(userId)
+  ) {
 
-let timestamps = userMessages.get(userId);
-
-timestamps = timestamps.filter(
-  t => now - t < SPAM_INTERVAL
-);
-
-timestamps.push(now);
-
-userMessages.set(userId, timestamps);
-
-if (timestamps.length >= SPAM_LIMIT) {
-
-  try {
-
-    await member.timeout(
-      SPAM_TIMEOUT,
-      'Spam detected'
+    userMessages.set(
+      userId,
+      []
     );
-
-    await message.channel.send(
-      `${message.author} got timed out for spamming 😭`
-    );
-
-    userMessages.delete(userId);
-
-  } catch (err) {
-
-    console.log(err);
 
   }
 
-  return;
-}
-```
+  let timestamps =
+    userMessages.get(userId);
 
-}
+  timestamps =
+    timestamps.filter(
+      t =>
+        now - t <
+        SPAM_INTERVAL
+    );
 
-});
+  timestamps.push(now);
 
-// ============================================================
-// INTERACTIONS
-// ============================================================
+  userMessages.set(
+    userId,
+    timestamps
+  );
 
-client.on('interactionCreate', async (interaction) => {
+  if (
+    timestamps.length >=
+    SPAM_LIMIT
+  ) {
 
-// ============================================================
-// /VETO
-// ============================================================
+    try {
 
-if (
-interaction.isChatInputCommand() &&
-interaction.commandName === 'veto'
-) {
+      await member.timeout(
+        SPAM_TIMEOUT,
+        'Spam detected'
+      );
 
-```
-activeVetos.set(
-  interaction.channel.id,
-  {
+      await message.channel.send(
+        `${message.author} got timed out for spamming 😭`
+      );
 
-    stage: 'leaders',
+      userMessages.delete(
+        userId
+      );
 
-    maps: [...MAP_POOL],
+    } catch (err) {
 
-    bans: [],
+      console.log(err);
 
-    picks: [],
+    }
 
-    leaders: [],
-
-    turn: 0,
-
-    sideChoices: {}
+    return;
 
   }
-);
-
-return interaction.reply({
-
-  content:
-```
-
-`🎮 Valorant VCT Veto Started
-
-Tag BOTH IGLs in one message.`
-
-```
-});
-```
 
 }
 
 // ============================================================
-// MAP BAN
+// STATS
+// ============================================================
+
+if (!stats[userId]) {
+
+  stats[userId] = {
+    messages: 0
+  };
+
+}
+
+stats[userId].messages++;
+
+// ============================================================
+// COMMANDS
 // ============================================================
 
 if (
-interaction.isStringSelectMenu() &&
-interaction.customId === 'veto_ban'
+  message.content.startsWith(
+    PREFIX
+  )
 ) {
 
-```
-const veto =
-  activeVetos.get(interaction.channel.id);
+  const args =
+    message.content
+      .slice(PREFIX.length)
+      .trim()
+      .split(/ +/);
 
-if (!veto) return;
+  const command =
+    args.shift().toLowerCase();
 
-const currentLeader =
-  veto.leaders[veto.turn];
+  // ============================================================
+  // HELP
+  // ============================================================
 
-if (
-  interaction.user.id !== currentLeader.id
-) {
+  if (command === 'help') {
 
-  return interaction.reply({
-    content: '❌ Not your turn.',
-    ephemeral: true
-  });
-
-}
-
-const selectedMap =
-  interaction.values[0];
-
-veto.maps =
-  veto.maps.filter(
-    map => map !== selectedMap
-  );
-
-veto.bans.push(selectedMap);
-
-await interaction.reply(
+    return message.reply(
 ```
 
-`❌ ${currentLeader} banned **${selectedMap}**`
-);
+`Commands:
+!help
+!joke
+!8ball
+!stats
+!valo
+!roast
+!ticketpanel
+!pet
+!friendship
+!veto`
 
 ```
-if (veto.bans.length === 1) {
+    );
 
-  veto.turn = 1;
+  }
 
-  return sendBanMenu(
-    interaction.channel,
-    veto
-  );
+  // ============================================================
+  // VETO
+  // ============================================================
 
-}
+  if (command === 'veto') {
 
-if (veto.bans.length === 2) {
-
-  veto.turn = 0;
-
-  return sendPickMenu(
-    interaction.channel,
-    veto
-  );
-
-}
-
-if (veto.bans.length === 3) {
-
-  veto.turn = 1;
-
-  return sendBanMenu(
-    interaction.channel,
-    veto
-  );
-
-}
-
-if (veto.bans.length === 4) {
-
-  const decider =
-    veto.maps[0];
-
-  const map1 =
-    veto.picks[0];
-
-  const map2 =
-    veto.picks[1];
-
-  const side1 =
-    veto.sideChoices[map1];
-
-  const side2 =
-    veto.sideChoices[map2];
-
-  const deciderSide =
-    Math.random() > 0.5
-      ? 'Attack'
-      : 'Defense';
-
-  const embed =
-    new EmbedBuilder()
-
-      .setTitle(
-        '✅ VCT Veto Complete'
+    if (
+      activeVetos.has(
+        message.channel.id
       )
+    ) {
 
-      .setColor(0x5865F2)
+      return message.reply(
+        '❌ A veto is already running.'
+      );
 
-      .setDescription(
+    }
+
+    activeVetos.set(
+      message.channel.id,
+      {
+
+        stage: 'leaders',
+
+        maps: [...MAP_POOL],
+
+        bans: [],
+
+        picks: [],
+
+        leaders: [],
+
+        turn: 0,
+
+        sideChoices: {}
+
+      }
+    );
+
+    return message.channel.send(
 ```
 
-`🗺️ **Map 1:** ${map1}
-🔫 Picker Starts: ${side1}
+`🎮 **Valorant VCT Veto**
 
-🗺️ **Map 2:** ${map2}
-🔫 Picker Starts: ${side2}
+Tag BOTH team IGLs in ONE message.
 
-🗺️ **Map 3:** ${decider}
-🎲 Random Side: ${deciderSide}`
+Example:
+@Team1IGL @Team2IGL`
+
+```
+    );
+
+  }
+
+  // ============================================================
+  // JOKE
+  // ============================================================
+
+  if (command === 'joke') {
+
+    return message.reply(
+
+      jokes[
+        Math.floor(
+          Math.random() *
+            jokes.length
+        )
+      ]
+
+    );
+
+  }
+
+  // ============================================================
+  // 8BALL
+  // ============================================================
+
+  if (command === '8ball') {
+
+    return message.reply(
+
+      eightBallResponses[
+        Math.floor(
+          Math.random() *
+            eightBallResponses.length
+        )
+      ]
+
+    );
+
+  }
+
+  // ============================================================
+  // STATS
+  // ============================================================
+
+  if (command === 'stats') {
+
+    const sorted =
+      Object.entries(stats)
+        .sort(
+          (a, b) =>
+            b[1].messages -
+            a[1].messages
+        );
+
+    if (!sorted.length) {
+
+      return message.reply(
+        'No data yet.'
+      );
+
+    }
+
+    const topUser =
+      sorted[0];
+
+    return message.reply(
+```
+
+`📊 Top chatter:
+<@${topUser[0]}>
+with ${topUser[1].messages} messages`
+
+```
+    );
+
+  }
+
+  // ============================================================
+  // ROAST
+  // ============================================================
+
+  if (command === 'roast') {
+
+    const target =
+      message.mentions.users.first();
+
+    if (!target) {
+
+      return message.reply(
+        'Tag someone to roast 😭'
+      );
+
+    }
+
+    if (
+      target.id === OWNER_ID
+    ) {
+
+      return message.reply(
+        'nah 😭 that’s my creator'
+      );
+
+    }
+
+    const roast =
+      roasts[
+        Math.floor(
+          Math.random() *
+            roasts.length
+        )
+      ];
+
+    return message.reply(
+      `${target}, ${roast}`
+    );
+
+  }
+
+  // ============================================================
+  // VALO
+  // ============================================================
+
+  if (command === 'valo') {
+
+    const input =
+      args[0];
+
+    if (
+      !input ||
+      !input.includes('#')
+    ) {
+
+      return message.reply(
+        'Use: !valo username#tag'
+      );
+
+    }
+
+    let [name, tag] =
+      input.split('#');
+
+    name =
+      name.toLowerCase();
+
+    tag =
+      tag.toLowerCase();
+
+    if (
+      OWNER_VALO_NAMES.includes(
+        name
+      )
+    ) {
+
+      return message.reply(
+```
+
+`🎮 ${name}#${tag}
+
+Playstyle:
+best player alive 😭`
 
 ```
       );
 
-  activeVetos.delete(
-    interaction.channel.id
-  );
+    }
 
-  return interaction.channel.send({
-    embeds: [embed]
-  });
+    try {
+
+      const res =
+        await axios.get(
+          `https://api.henrikdev.xyz/valorant/v1/account/${name}/${tag}`
+        );
+
+      const player =
+        res.data.data;
+
+      const personality =
+        valoPersonalities[
+          Math.floor(
+            Math.random() *
+              valoPersonalities.length
+          )
+        ];
+
+      return message.reply(
+```
+
+`🎮 ${player.name}#${player.tag}
+
+Playstyle:
+${personality}`
+
+```
+      );
+
+    } catch {
+
+      const fallback =
+        valoFallbacks[
+          Math.floor(
+            Math.random() *
+              valoFallbacks.length
+          )
+        ];
+
+      return message.reply(
+```
+
+`🎮 ${name}#${tag}
+
+(API couldn't verify)
+
+Playstyle:
+${fallback}`
+
+```
+      );
+
+    }
+
+  }
 
 }
 ```
 
 }
+);
 
 // ============================================================
-// MAP PICK
+// INTERACTION CREATE
 // ============================================================
 
-if (
-interaction.isStringSelectMenu() &&
-interaction.customId === 'veto_pick'
-) {
+client.on(
+'interactionCreate',
+async interaction => {
 
 ```
-const veto =
-  activeVetos.get(interaction.channel.id);
-
-if (!veto) return;
-
-const currentLeader =
-  veto.leaders[veto.turn];
+// ============================================================
+// SELECT MENUS
+// ============================================================
 
 if (
-  interaction.user.id !== currentLeader.id
+  interaction.isSelectMenu()
 ) {
 
-  return interaction.reply({
-    content: '❌ Not your turn.',
-    ephemeral: true
-  });
+  const veto =
+    activeVetos.get(
+      interaction.channel.id
+    );
 
-}
+  if (!veto) return;
 
-const selectedMap =
-  interaction.values[0];
+  const currentLeader =
+    veto.leaders[
+      veto.turn
+    ];
 
-veto.maps =
-  veto.maps.filter(
-    map => map !== selectedMap
-  );
+  if (
+    interaction.user.id !==
+    currentLeader.id
+  ) {
 
-veto.picks.push(selectedMap);
+    return interaction.reply({
+      content:
+        '❌ Not your turn.',
+      ephemeral: true
+    });
 
-veto.sideChoices[selectedMap] =
-  veto.turn === 0
-    ? 'Attack'
-    : 'Defense';
+  }
 
-await interaction.reply(
+  // ============================================================
+  // MAP BAN
+  // ============================================================
+
+  if (
+    interaction.customId ===
+    'veto_ban'
+  ) {
+
+    const selectedMap =
+      interaction.values[0];
+
+    veto.maps =
+      veto.maps.filter(
+        map =>
+          map !==
+          selectedMap
+      );
+
+    veto.bans.push(
+      selectedMap
+    );
+
+    await interaction.reply(
+```
+
+`❌ ${currentLeader} banned **${selectedMap}**`
+
+```
+    );
+
+    // FLOW
+
+    if (
+      veto.bans.length === 1
+    ) {
+
+      veto.turn = 1;
+
+      return sendBanMenu(
+        interaction.channel,
+        veto
+      );
+
+    }
+
+    if (
+      veto.bans.length === 2
+    ) {
+
+      veto.turn = 0;
+
+      return sendPickMenu(
+        interaction.channel,
+        veto
+      );
+
+    }
+
+    if (
+      veto.bans.length === 3
+    ) {
+
+      veto.turn = 1;
+
+      return sendBanMenu(
+        interaction.channel,
+        veto
+      );
+
+    }
+
+    if (
+      veto.bans.length === 4
+    ) {
+
+      const deciderMap =
+        veto.maps[0];
+
+      const map1 =
+        veto.picks[0];
+
+      const map2 =
+        veto.picks[1];
+
+      const side1 =
+        veto.sideChoices[
+          map1
+        ];
+
+      const side2 =
+        veto.sideChoices[
+          map2
+        ];
+
+      const deciderSide =
+        Math.random() > 0.5
+          ? 'Attack'
+          : 'Defense';
+
+      const embed =
+        new MessageEmbed()
+
+          .setTitle(
+            '✅ VCT Veto Complete'
+          )
+
+          .setColor(
+            '#5865F2'
+          )
+
+          .setDescription(
+```
+
+`🗺️ Map 1: ${map1}
+🔫 Picker Side: ${side1}
+
+🗺️ Map 2: ${map2}
+🔫 Picker Side: ${side2}
+
+🗺️ Map 3: ${deciderMap}
+🎲 Decider Side: ${deciderSide}`
+
+```
+          );
+
+      activeVetos.delete(
+        interaction.channel.id
+      );
+
+      return interaction.channel.send({
+        embeds: [embed]
+      });
+
+    }
+
+  }
+
+  // ============================================================
+  // MAP PICK
+  // ============================================================
+
+  if (
+    interaction.customId ===
+    'veto_pick'
+  ) {
+
+    const selectedMap =
+      interaction.values[0];
+
+    veto.maps =
+      veto.maps.filter(
+        map =>
+          map !==
+          selectedMap
+      );
+
+    veto.picks.push(
+      selectedMap
+    );
+
+    veto.sideChoices[
+      selectedMap
+    ] =
+      veto.turn === 0
+        ? 'Attack'
+        : 'Defense';
+
+    await interaction.reply(
 ```
 
 `✅ ${currentLeader} picked **${selectedMap}**`
+
+```
+    );
+
+    if (
+      veto.picks.length === 1
+    ) {
+
+      veto.turn = 1;
+
+      return sendPickMenu(
+        interaction.channel,
+        veto
+      );
+
+    }
+
+    if (
+      veto.picks.length === 2
+    ) {
+
+      veto.turn = 0;
+
+      return sendBanMenu(
+        interaction.channel,
+        veto
+      );
+
+    }
+
+  }
+
+}
+```
+
+}
 );
-
-```
-if (veto.picks.length === 1) {
-
-  veto.turn = 1;
-
-  return sendPickMenu(
-    interaction.channel,
-    veto
-  );
-
-}
-
-if (veto.picks.length === 2) {
-
-  veto.turn = 0;
-
-  return sendBanMenu(
-    interaction.channel,
-    veto
-  );
-
-}
-```
-
-}
-
-});
 
 // ============================================================
 // SEND BAN MENU
@@ -686,10 +1001,12 @@ const currentLeader =
 veto.leaders[veto.turn];
 
 const menu =
-new StringSelectMenuBuilder()
+new MessageSelectMenu()
 
 ```
-  .setCustomId('veto_ban')
+  .setCustomId(
+    'veto_ban'
+  )
 
   .setPlaceholder(
     'Select map to ban'
@@ -697,19 +1014,21 @@ new StringSelectMenuBuilder()
 
   .addOptions(
 
-    veto.maps.map(map => ({
+    veto.maps.map(
+      map => ({
 
-      label: map,
+        label: map,
 
-      value: map
+        value: map
 
-    }))
+      })
+    )
 
   );
 ```
 
 const row =
-new ActionRowBuilder()
+new MessageActionRow()
 .addComponents(menu);
 
 return channel.send({
@@ -743,10 +1062,12 @@ const currentLeader =
 veto.leaders[veto.turn];
 
 const menu =
-new StringSelectMenuBuilder()
+new MessageSelectMenu()
 
 ```
-  .setCustomId('veto_pick')
+  .setCustomId(
+    'veto_pick'
+  )
 
   .setPlaceholder(
     'Select map to pick'
@@ -754,19 +1075,21 @@ new StringSelectMenuBuilder()
 
   .addOptions(
 
-    veto.maps.map(map => ({
+    veto.maps.map(
+      map => ({
 
-      label: map,
+        label: map,
 
-      value: map
+        value: map
 
-    }))
+      })
+    )
 
   );
 ```
 
 const row =
-new ActionRowBuilder()
+new MessageActionRow()
 .addComponents(menu);
 
 return channel.send({
@@ -791,4 +1114,6 @@ components: [row]
 // LOGIN
 // ============================================================
 
-client.login(process.env.DISCORD_TOKEN);
+client.login(
+process.env.DISCORD_TOKEN
+);
