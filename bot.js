@@ -544,6 +544,7 @@ Commands:
 !bo1
 !ban
 !status
+!cancelban
       `);
     }
 
