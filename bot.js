@@ -315,6 +315,42 @@ client.on('messageCreate', async (message) => {
 
     const command = args.shift().toLowerCase();
     // ============================================================
+// CANCEL MAP BAN
+// ============================================================
+
+if (command === 'cancelban') {
+
+  if (
+    !message.member.permissions.has(
+      PermissionsBitField.Flags.Administrator
+    )
+  ) {
+
+    return message.reply(
+      '❌ Only admins can cancel a map ban.'
+    );
+  }
+
+  if (
+    !activeMapBans.has(
+      message.channel.id
+    )
+  ) {
+
+    return message.reply(
+      '❌ No active map ban in this channel.'
+    );
+  }
+
+  activeMapBans.delete(
+    message.channel.id
+  );
+
+  return message.reply(
+    '🗑️ Map ban cancelled.'
+  );
+}
+    // ============================================================
 // BO1 START
 // ============================================================
 
@@ -335,7 +371,7 @@ if (command === 'bo1') {
   if (activeMapBans.has(message.channel.id)) {
 
     return message.reply(
-      '❌ A map ban is already active in this channel.'
+      '❌ A map ban is already active.\nUse `!status` to view it or `!cancelban` to remove it.'
     );
   }
 
