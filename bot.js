@@ -446,19 +446,26 @@ if (command === 'ban') {
 
   if (session.maps.length === 1) {
 
-    const finalMap =
-      session.maps[0];
+  const finalMap =
+    session.maps[0];
 
-    activeMapBans.delete(
-      message.channel.id
-    );
+  activeMapBans.delete(
+    message.channel.id
+  );
 
-    return message.reply(
+  const imagePath =
+    `./photos/maps/${finalMap}.webp`;
+
+  await message.reply(
 `🎉 MAP SELECTED
 
 ${finalMap.toUpperCase()}`
-    );
-  }
+  );
+
+  return message.channel.send({
+    files: [imagePath]
+  });
+}
 
   session.turn =
     session.turn === session.captains[0]
