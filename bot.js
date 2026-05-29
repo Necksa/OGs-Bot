@@ -305,7 +305,16 @@ client.on('messageCreate', async (message) => {
   // ============================================================
   // COMMANDS
   // ============================================================
+if (command === 'cancelban') {
 
+  if (!activeMapBans.has(message.channel.id)) {
+    return message.reply('❌ No active map ban.');
+  }
+
+  activeMapBans.delete(message.channel.id);
+
+  return message.reply('🗑️ Map ban cancelled.');
+}
   if (message.content.startsWith(PREFIX)) {
 
     const args = message.content
