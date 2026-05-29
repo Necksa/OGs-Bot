@@ -15,7 +15,10 @@ const {
 } = require('discord.js');
 
 const axios = require('axios');
-const { activeMapBans } = require('./systems/mapban');
+const {
+  activeMapBans,
+  MAP_POOL
+} = require('./systems/mapban');
 const fs = require('fs');
 
 const client = new Client({
@@ -311,6 +314,181 @@ client.on('messageCreate', async (message) => {
       .split(/ +/);
 
     const command = args.shift().toLowerCase();
+    // ============================================================
+// BO1 START
+// ============================================================
+
+if (command === 'bo1') {
+
+  const captainA = message.mentions.users.first();
+
+  const captainB =
+    message.mentions.users.at(1);
+
+  if (!captainA || !captainB) {
+
+    return message.reply(
+      'Use: !bo1 @CaptainA @CaptainB'
+    );
+  }
+
+  if (activeMapBans.has(message.channel.id)) {
+
+    return message.reply(
+      '❌ A map ban is already active in this channel.'
+    );
+  }
+
+  activeMapBans.set(
+    message.channel.id,
+    {
+      captains: [
+        captainA.id,
+        captainB.id
+      ],
+      turn: captainA.id,
+      maps: [...MAP_POOL]
+    }
+  );
+
+  return message.reply(
+`🎮 BO1 MAP BAN STARTED
+
+${captainA} bans first.
+
+Remaining Maps:
+${MAP_POOL.map(
+  m => `• ${m.charAt(0).toUpperCase() + m.slice(1)}`
+).join('\n')}
+
+Use:
+!ban <map>`
+  );
+}
+
+// ============================================================
+// BAN MAP
+// ============================================================
+
+if (command === 'ban') {
+
+  const session =
+    activeMapBans.get(message.channel.id);
+
+  if (!session) {
+
+    return message.reply(
+      '❌ No active BO1 in this channel.'
+    );
+  }
+
+  if (
+    message.author.id !== session.turn
+  ) {
+
+    return message.reply(
+      '❌ Not your turn.'
+    );
+  }
+
+  const map =
+    args.join(' ').toLowerCase();
+
+  if (
+    !session.maps.includes(map)
+  ) {
+
+    return message.reply(
+      '❌ Invalid map.'
+    );
+  }
+
+  session.maps =
+    session.maps.filter(
+      m => m !== map
+    );
+
+  if (session.maps.length === 1) {
+
+    const finalMap =
+      session.maps[0];
+
+    activeMapBans.delete(
+      message.channel.id
+    );
+
+    return message.reply(
+`🎉 MAP SELECTED
+
+${finalMap.toUpperCase()}`
+    );
+  }
+
+  session.turn =
+    session.turn === session.captains[0]
+      ? session.captains[1]
+      : session.captains[0];
+
+  activeMapBans.set(
+    message.channel.id,
+    session
+  );
+
+  return message.reply(
+`❌ ${map.toUpperCase()} banned
+
+Remaining Maps:
+
+${session.maps
+  .map(
+    m =>
+      `• ${
+        m.charAt(0).toUpperCase() +
+        m.slice(1)
+      }`
+  )
+  .join('\n')}
+
+Next Ban:
+<@${session.turn}>`
+  );
+}
+
+// ============================================================
+// BO1 STATUS
+// ============================================================
+
+if (command === 'status') {
+
+  const session =
+    activeMapBans.get(message.channel.id);
+
+  if (!session) {
+
+    return message.reply(
+      '❌ No active BO1.'
+    );
+  }
+
+  return message.reply(
+`🎮 CURRENT BO1
+
+Current Turn:
+<@${session.turn}>
+
+Remaining Maps:
+
+${session.maps
+  .map(
+    m =>
+      `• ${
+        m.charAt(0).toUpperCase() +
+        m.slice(1)
+      }`
+  )
+  .join('\n')}`
+  );
+}
 
     // HELP
 
@@ -327,6 +505,9 @@ Commands:
 !ticketpanel
 !pet
 !friendship
+!bo1
+!ban
+!status
       `);
     }
 
