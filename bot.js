@@ -15,6 +15,7 @@ const {
 } = require('discord.js');
 
 const axios = require('axios');
+const { activeMapBans } = require('./systems/mapban');
 const fs = require('fs');
 
 const client = new Client({
