@@ -357,151 +357,96 @@ if (command === 'cancelban') {
 if (command === 'bo1') {
 
   const captainA = message.mentions.users.first();
-
-  const captainB =
-    message.mentions.users.at(1);
+  const captainB = message.mentions.users.at(1);
 
   if (!captainA || !captainB) {
-
     return message.reply(
       'Use: !bo1 @CaptainA @CaptainB'
     );
   }
 
-  if (activeMapBans.has(message.channel.id)) {
+  activeMapBans.set(message.channel.id, {
+    mode: 'bo1',
+    captains: [
+      captainA.id,
+      captainB.id
+    ],
+    turn: captainA.id,
+    maps: [...MAP_POOL]
+  });
 
+  const buttons = MAP_POOL.map(map =>
+    new ButtonBuilder()
+      .setCustomId(`bo1_${map}`)
+      .setLabel(
+        map.charAt(0).toUpperCase() +
+        map.slice(1)
+      )
+      .setStyle(ButtonStyle.Danger)
+  );
+
+  const row1 =
+    new ActionRowBuilder().addComponents(
+      buttons.slice(0, 5)
+    );
+
+  const row2 =
+    new ActionRowBuilder().addComponents(
+      buttons.slice(5)
+    );
+
+  return message.channel.send({
+    content:
+      `🎮 BO1 MAP BAN\n\n${captainA} please ban a map.`,
+    components: [row1, row2]
+  });
+
+}
+
+if (command === 'bo3') {
+
+  const captainA = message.mentions.users.first();
+  const captainB = message.mentions.users.at(1);
+
+  if (!captainA || !captainB) {
     return message.reply(
-      '❌ A map ban is already active.\nUse `!status` to view it or `!cancelban` to remove it.'
+      'Use: !bo3 @CaptainA @CaptainB'
     );
   }
 
-  activeMapBans.set(
-    message.channel.id,
-    {
-      captains: [
-        captainA.id,
-        captainB.id
-      ],
-      turn: captainA.id,
-      maps: [...MAP_POOL]
-    }
-  );
+  activeMapBans.set(message.channel.id, {
+    mode: 'bo3',
+    captains: [
+      captainA.id,
+      captainB.id
+    ],
+    maps: [...MAP_POOL],
+    phase: 1
+  });
 
   return message.reply(
-`🎮 BO1 MAP BAN STARTED
-
-${captainA} bans first.
-
-Remaining Maps:
-${MAP_POOL.map(
-  m => `• ${m.charAt(0).toUpperCase() + m.slice(1)}`
-).join('\n')}
-
-Use:
-!ban <map>`
+    '✅ BO3 created.\n(BO3 button logic will be added next.)'
   );
 }
 
-// ============================================================
-// BAN MAP
-// ============================================================
-
-if (command === 'ban') {
+if (command === 'status') {
 
   const session =
     activeMapBans.get(message.channel.id);
 
-  if (!session) {
-
+  if (!session)
     return message.reply(
-      '❌ No active BO1 in this channel.'
+      '❌ No active veto.'
     );
-  }
-
-  if (
-    message.author.id !== session.turn
-  ) {
-
-    return message.reply(
-      '❌ Not your turn.'
-    );
-  }
-
-  const map =
-    args.join(' ').toLowerCase();
-
-  if (
-    !session.maps.includes(map)
-  ) {
-
-    return message.reply(
-      '❌ Invalid map.'
-    );
-  }
-
-  session.maps =
-    session.maps.filter(
-      m => m !== map
-    );
-
-  if (session.maps.length === 1) {
-
-  const finalMap =
-    session.maps[0];
-
-  activeMapBans.delete(
-    message.channel.id
-  );
-
-  const imagePath =
-    `./photos/maps/${finalMap}.webp`;
-
-  await message.reply(
-`🎉 MAP SELECTED
-
-${finalMap.toUpperCase()}`
-  );
-
-  return message.channel.send({
-    files: [imagePath]
-  });
-}
-
-  session.turn =
-    session.turn === session.captains[0]
-      ? session.captains[1]
-      : session.captains[0];
-
-  activeMapBans.set(
-    message.channel.id,
-    session
-  );
 
   return message.reply(
-`❌ ${map.toUpperCase()} banned
+`Mode: ${session.mode}
 
 Remaining Maps:
 
-${session.maps
-  .map(
-    m =>
-      `• ${
-        m.charAt(0).toUpperCase() +
-        m.slice(1)
-      }`
-  )
-  .join('\n')}
-
-Next Ban:
-<@${session.turn}>`
+${session.maps.join('\n')}`
   );
 }
-
-// ============================================================
-// BO1 STATUS
-// ============================================================
-
-if (command === 'status') {
 
   const session =
     activeMapBans.get(message.channel.id);
@@ -961,6 +906,122 @@ if (
 client.on('interactionCreate', async (interaction) => {
 
   if (!interaction.isButton()) return;
+  const session =
+  activeMapBans.get(
+    interaction.channel.id
+  );
+
+if (
+  interaction.customId.startsWith('bo1_')
+) {
+
+  if (!session) return;
+
+  if (
+    !session.captains.includes(
+      interaction.user.id
+    )
+  ) {
+
+    return interaction.reply({
+      content:
+        '❌ Only captains may participate.',
+      ephemeral: true
+    });
+  }
+
+  if (
+    interaction.user.id !==
+    session.turn
+  ) {
+
+    return interaction.reply({
+      content:
+        '❌ It is not your turn.',
+      ephemeral: true
+    });
+  }
+
+  const map =
+    interaction.customId.replace(
+      'bo1_',
+      ''
+    );
+
+  session.maps =
+    session.maps.filter(
+      m => m !== map
+    );
+
+  if (
+    session.maps.length === 1
+  ) {
+
+    const finalMap =
+      session.maps[0];
+
+    activeMapBans.delete(
+      interaction.channel.id
+    );
+
+    await interaction.update({
+      content:
+        `🎉 MAP SELECTED\n\n${finalMap.toUpperCase()}`,
+      components: []
+    });
+
+    return interaction.channel.send({
+      files: [
+        `./photos/maps/${finalMap}.webp`
+      ]
+    });
+  }
+
+  session.turn =
+    session.turn ===
+    session.captains[0]
+      ? session.captains[1]
+      : session.captains[0];
+
+  const buttons =
+    session.maps.map(map =>
+      new ButtonBuilder()
+        .setCustomId(`bo1_${map}`)
+        .setLabel(
+          map.charAt(0).toUpperCase() +
+          map.slice(1)
+        )
+        .setStyle(ButtonStyle.Danger)
+    );
+
+  const rows = [];
+
+  for (
+    let i = 0;
+    i < buttons.length;
+    i += 5
+  ) {
+
+    rows.push(
+      new ActionRowBuilder()
+        .addComponents(
+          buttons.slice(
+            i,
+            i + 5
+          )
+        )
+    );
+  }
+
+  return interaction.update({
+
+    content:
+      `❌ ${map.toUpperCase()} banned\n\n<@${session.turn}> please ban a map.`,
+
+    components: rows
+
+  });
+}
 
   // ============================================================
   // CREATE TICKET
