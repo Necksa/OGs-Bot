@@ -20,6 +20,7 @@ const {
   MAP_POOL
 } = require('./systems/mapban');
 const fs = require('fs');
+const veto = require('./systems/veto');
 
 const client = new Client({
   intents: [
@@ -314,6 +315,20 @@ client.on('messageCreate', async (message) => {
       .split(/ +/);
 
     const command = args.shift().toLowerCase();
+    if (
+  command === 'bo1' ||
+  command === 'bo3' ||
+  command === 'status' ||
+  command === 'cancelban'
+) {
+
+  return veto.handleCommand(
+    message,
+    command,
+    args
+  );
+
+}
    
     // HELP
 
@@ -742,122 +757,14 @@ if (
 client.on('interactionCreate', async (interaction) => {
 
   if (!interaction.isButton()) return;
-  const session =
-  activeMapBans.get(
-    interaction.channel.id
-  );
 
-if (
-  interaction.customId.startsWith('bo1_')
-) {
-
-  if (!session) return;
-
-  if (
-    !session.captains.includes(
-      interaction.user.id
-    )
-  ) {
-
-    return interaction.reply({
-      content:
-        '❌ Only captains may participate.',
-      ephemeral: true
-    });
-  }
-
-  if (
-    interaction.user.id !==
-    session.turn
-  ) {
-
-    return interaction.reply({
-      content:
-        '❌ It is not your turn.',
-      ephemeral: true
-    });
-  }
-
-  const map =
-    interaction.customId.replace(
-      'bo1_',
-      ''
+  const handled =
+    await veto.handleInteraction(
+      interaction
     );
 
-  session.maps =
-    session.maps.filter(
-      m => m !== map
-    );
+  if (handled) return;
 
-  if (
-    session.maps.length === 1
-  ) {
-
-    const finalMap =
-      session.maps[0];
-
-    activeMapBans.delete(
-      interaction.channel.id
-    );
-
-    await interaction.update({
-      content:
-        `🎉 MAP SELECTED\n\n${finalMap.toUpperCase()}`,
-      components: []
-    });
-
-    return interaction.channel.send({
-      files: [
-        `./photos/maps/${finalMap}.webp`
-      ]
-    });
-  }
-
-  session.turn =
-    session.turn ===
-    session.captains[0]
-      ? session.captains[1]
-      : session.captains[0];
-
-  const buttons =
-    session.maps.map(map =>
-      new ButtonBuilder()
-        .setCustomId(`bo1_${map}`)
-        .setLabel(
-          map.charAt(0).toUpperCase() +
-          map.slice(1)
-        )
-        .setStyle(ButtonStyle.Danger)
-    );
-
-  const rows = [];
-
-  for (
-    let i = 0;
-    i < buttons.length;
-    i += 5
-  ) {
-
-    rows.push(
-      new ActionRowBuilder()
-        .addComponents(
-          buttons.slice(
-            i,
-            i + 5
-          )
-        )
-    );
-  }
-
-  return interaction.update({
-
-    content:
-      `❌ ${map.toUpperCase()} banned\n\n<@${session.turn}> please ban a map.`,
-
-    components: rows
-
-  });
-}
 
   // ============================================================
   // CREATE TICKET
