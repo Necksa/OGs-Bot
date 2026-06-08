@@ -675,7 +675,7 @@ ${decider.toUpperCase()}`,
   // =====================
   // EXISTING BO1 CODE
   // =====================
-```
+
 
 
 if (command === 'status') {
@@ -690,7 +690,7 @@ if (command === 'status') {
     );
   }
 
-  return message.reply(
+return message.reply(
 `🎮 CURRENT BO1
 
 Current Turn:
@@ -707,7 +707,7 @@ ${session.maps
       }`
   )
   .join('\n')}`
-  );
+);
 }
 
     // HELP
