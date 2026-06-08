@@ -676,7 +676,7 @@ ${decider.toUpperCase()}`,
   // EXISTING BO1 CODE
   // =====================
 
-
+}
 
 if (command === 'status') {
 
