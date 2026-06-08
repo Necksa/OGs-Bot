@@ -17,7 +17,8 @@ const {
 const axios = require('axios');
 const {
   activeMapBans,
-  MAP_POOL
+  MAP_POOL,
+  mapImages
 } = require('./systems/mapban');
 const fs = require('fs');
 
