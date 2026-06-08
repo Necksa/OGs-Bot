@@ -581,11 +581,17 @@ if (command === 'ban') {
     return message.reply(
 `❌ ${map.toUpperCase()} banned
 
+Remaining Maps:
+
+${session.maps
+  .map(m => `• ${m.charAt(0).toUpperCase() + m.slice(1)}`)
+  .join('\n')}
+
 Phase:
 BAN 2
 
 <@${session.turn}> bans next.`
-    );
+);
   }
 
   if (session.phase === 'ban2') {
@@ -601,21 +607,32 @@ BAN 2
     return message.reply(
 `❌ ${map.toUpperCase()} banned
 
+Remaining Maps:
+
+${session.maps
+  .map(m => `• ${m.charAt(0).toUpperCase() + m.slice(1)}`)
+  .join('\n')}
+
 Phase:
-PICK 1
+BAN 2
 
 <@${session.turn}> picks next.`
-    );
+);
   }
 
-  if (session.phase === 'ban3') {
+  return message.reply(
+`❌ ${map.toUpperCase()} banned
 
-    session.phase = 'ban4';
-    session.turn =
-      session.captains[1];
-    activeMapBans.set(
-  message.channel.id,
-  session
+Remaining Maps:
+
+${session.maps
+  .map(m => `• ${m.charAt(0).toUpperCase() + m.slice(1)}`)
+  .join('\n')}
+
+Phase:
+BAN 4
+
+<@${session.turn}> bans next.`
 );
 
     return message.reply(
