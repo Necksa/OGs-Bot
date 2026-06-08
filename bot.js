@@ -433,7 +433,7 @@ if (command === 'pick') {
   session.picks.push(map);
 
   await message.channel.send({
-    content: `🗺️ MAP PICKED\n\n${map.toUpperCase()}`,
+   content: `🗺️ MAP PICKED\n\n${map.toUpperCase()}`,
     files: [mapImages[map]]
   });
 
