@@ -402,6 +402,7 @@ Use:
 !ban <map>`
   );
 }
+```js
 // ============================================================
 // PICK MAP
 // ============================================================
@@ -409,56 +410,42 @@ Use:
 if (command === 'pick') {
 
   const session =
-    activeMapBans.get(
-      message.channel.id
-    );
+    activeMapBans.get(message.channel.id);
 
-  if (
-    !session ||
-    session.mode !== 'bo3'
-  ) {
-    return message.reply(
-      '❌ No active BO3.'
-    );
+  if (!session || session.mode !== 'bo3') {
+    return message.reply('❌ No active BO3.');
   }
 
-  if (
-    message.author.id !== session.turn
-  ) {
-    return message.reply(
-      '❌ Not your turn.'
-    );
+  if (message.author.id !== session.turn) {
+    return message.reply('❌ Not your turn.');
   }
 
-  const map =
-    args.join(' ').toLowerCase();
+  const map = args.join(' ').toLowerCase();
 
-  if (
-    !session.maps.includes(map)
-  ) {
-    return message.reply(
-      '❌ Invalid map.'
-    );
+  if (!session.maps.includes(map)) {
+    return message.reply('❌ Invalid map.');
   }
 
-  session.maps =
-    session.maps.filter(
-      m => m !== map
-    );
+  session.maps = session.maps.filter(
+    m => m !== map
+  );
 
   session.picks.push(map);
 
   await message.channel.send({
-    content:
-      `🗺️ MAP PICKED\n\n${map.toUpperCase()}`,
+    content: `🗺️ MAP PICKED\n\n${map.toUpperCase()}`,
     files: [mapImages[map]]
   });
 
   if (session.phase === 'pick1') {
 
     session.phase = 'pick2';
-    session.turn =
-      session.captains[1];
+    session.turn = session.captains[1];
+
+    activeMapBans.set(
+      message.channel.id,
+      session
+    );
 
     return message.reply(
       `<@${session.turn}> picks next.`
@@ -468,8 +455,12 @@ if (command === 'pick') {
   if (session.phase === 'pick2') {
 
     session.phase = 'ban3';
-    session.turn =
-      session.captains[0];
+    session.turn = session.captains[0];
+
+    activeMapBans.set(
+      message.channel.id,
+      session
+    );
 
     return message.reply(
 `🎮 Picks Complete
@@ -481,9 +472,7 @@ BAN 3
     );
   }
 }
-// ============================================================
-// BAN MAP
-// ============================================================
+
 // ============================================================
 // BO3 START
 // ============================================================
@@ -533,129 +522,136 @@ ${MAP_POOL.map(
 
 Use:
 !ban <map>`
-);
+  );
 }
+
+// ============================================================
+// BAN MAP
+// ============================================================
+
 if (command === 'ban') {
 
   const session =
     activeMapBans.get(message.channel.id);
-  if (
-  session &&
-  session.mode === 'bo3'
-) {
 
-  if (
-    message.author.id !== session.turn
-  ) {
-    return message.reply(
-      '❌ Not your turn.'
-    );
-  }
+  // =====================
+  // BO3
+  // =====================
 
-  const map =
-    args.join(' ').toLowerCase();
+  if (session && session.mode === 'bo3') {
 
-  if (
-    !session.maps.includes(map)
-  ) {
-    return message.reply(
-      '❌ Invalid map.'
-    );
-  }
+    if (message.author.id !== session.turn) {
+      return message.reply(
+        '❌ Not your turn.'
+      );
+    }
 
-  session.maps =
-    session.maps.filter(
-      m => m !== map
-    );
+    const map =
+      args.join(' ').toLowerCase();
 
-  if (session.phase === 'ban1') {
+    if (!session.maps.includes(map)) {
+      return message.reply(
+        '❌ Invalid map.'
+      );
+    }
 
-    session.phase = 'ban2';
-    session.turn =
-      session.captains[1];
-    activeMapBans.set(
-  message.channel.id,
-  session
-);
+    session.maps =
+      session.maps.filter(
+        m => m !== map
+      );
 
-    return message.reply(
+    if (session.phase === 'ban1') {
+
+      session.phase = 'ban2';
+      session.turn =
+        session.captains[1];
+
+      activeMapBans.set(
+        message.channel.id,
+        session
+      );
+
+      return message.reply(
 `❌ ${map.toUpperCase()} banned
 
 Remaining Maps:
 
-${session.maps
-  .map(m => `• ${m.charAt(0).toUpperCase() + m.slice(1)}`)
-  .join('\n')}
+${session.maps.map(
+  m => `• ${m.charAt(0).toUpperCase() + m.slice(1)}`
+).join('\n')}
 
 Phase:
 BAN 2
 
 <@${session.turn}> bans next.`
-);
-  }
+      );
+    }
 
-  if (session.phase === 'ban2') {
+    if (session.phase === 'ban2') {
 
-    session.phase = 'pick1';
-    session.turn =
-      session.captains[0];
-    activeMapBans.set(
-  message.channel.id,
-  session
-);
+      session.phase = 'pick1';
+      session.turn =
+        session.captains[0];
 
-    return message.reply(
+      activeMapBans.set(
+        message.channel.id,
+        session
+      );
+
+      return message.reply(
 `❌ ${map.toUpperCase()} banned
 
 Remaining Maps:
 
-${session.maps
-  .map(m => `• ${m.charAt(0).toUpperCase() + m.slice(1)}`)
-  .join('\n')}
+${session.maps.map(
+  m => `• ${m.charAt(0).toUpperCase() + m.slice(1)}`
+).join('\n')}
 
 Phase:
-BAN 2
+PICK 1
 
 <@${session.turn}> picks next.`
-);
-  }
+      );
+    }
 
-  return message.reply(
+    if (session.phase === 'ban3') {
+
+      session.phase = 'ban4';
+      session.turn =
+        session.captains[1];
+
+      activeMapBans.set(
+        message.channel.id,
+        session
+      );
+
+      return message.reply(
 `❌ ${map.toUpperCase()} banned
 
 Remaining Maps:
 
-${session.maps
-  .map(m => `• ${m.charAt(0).toUpperCase() + m.slice(1)}`)
-  .join('\n')}
+${session.maps.map(
+  m => `• ${m.charAt(0).toUpperCase() + m.slice(1)}`
+).join('\n')}
 
 Phase:
 BAN 4
 
 <@${session.turn}> bans next.`
-);
+      );
+    }
 
-    return message.reply(
-`❌ ${map.toUpperCase()} banned
+    if (session.phase === 'ban4') {
 
-Phase:
-BAN 4
+      const decider =
+        session.maps[0];
 
-<@${session.turn}> bans next.`
-    );
-  }
+      activeMapBans.delete(
+        message.channel.id
+      );
 
-  if (session.phase === 'ban4') {
-
-    const decider =
-      session.maps[0];
-
-    activeMapBans.delete(
-      message.channel.id
-    );
-
-    await message.channel.send({
-      content:
+      await message.channel.send({
+        content:
 `🎉 BO3 COMPLETE
 
 🗺️ MAP 1
@@ -666,105 +662,20 @@ ${session.picks[1].toUpperCase()}
 
 🎯 DECIDER
 ${decider.toUpperCase()}`,
-      files: [
-        mapImages[decider]
-      ]
-    });
+        files: [
+          mapImages[decider]
+        ]
+      });
 
-    return;
+      return;
+    }
   }
 
-}
+  // =====================
+  // EXISTING BO1 CODE
+  // =====================
+```
 
-  if (!session) {
-
-    return message.reply(
-      '❌ No active BO1 in this channel.'
-    );
-  }
-
-  if (
-    message.author.id !== session.turn
-  ) {
-
-    return message.reply(
-      '❌ Not your turn.'
-    );
-  }
-
-  const map =
-    args.join(' ').toLowerCase();
-
-  if (
-    !session.maps.includes(map)
-  ) {
-
-    return message.reply(
-      '❌ Invalid map.'
-    );
-  }
-
-  session.maps =
-    session.maps.filter(
-      m => m !== map
-    );
-
-  if (session.maps.length === 1) {
-
-  const finalMap =
-    session.maps[0];
-
-  activeMapBans.delete(
-    message.channel.id
-  );
-
-  const imagePath =
-    `./photos/maps/${finalMap}.webp`;
-
-  await message.reply(
-`🎉 MAP SELECTED
-
-${finalMap.toUpperCase()}`
-  );
-
-  return message.channel.send({
-    files: [imagePath]
-  });
-}
-
-  session.turn =
-    session.turn === session.captains[0]
-      ? session.captains[1]
-      : session.captains[0];
-
-  activeMapBans.set(
-    message.channel.id,
-    session
-  );
-
-  return message.reply(
-`❌ ${map.toUpperCase()} banned
-
-Remaining Maps:
-
-${session.maps
-  .map(
-    m =>
-      `• ${
-        m.charAt(0).toUpperCase() +
-        m.slice(1)
-      }`
-  )
-  .join('\n')}
-
-Next Ban:
-<@${session.turn}>`
-  );
-}
-
-// ============================================================
-// BO1 STATUS
-// ============================================================
 
 if (command === 'status') {
 
