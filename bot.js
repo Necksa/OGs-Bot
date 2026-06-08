@@ -564,6 +564,10 @@ if (command === 'ban') {
     session.phase = 'ban2';
     session.turn =
       session.captains[1];
+    activeMapBans.set(
+  message.channel.id,
+  session
+);
 
     return message.reply(
 `❌ ${map.toUpperCase()} banned
@@ -580,6 +584,10 @@ BAN 2
     session.phase = 'pick1';
     session.turn =
       session.captains[0];
+    activeMapBans.set(
+  message.channel.id,
+  session
+);
 
     return message.reply(
 `❌ ${map.toUpperCase()} banned
@@ -596,6 +604,10 @@ PICK 1
     session.phase = 'ban4';
     session.turn =
       session.captains[1];
+    activeMapBans.set(
+  message.channel.id,
+  session
+);
 
     return message.reply(
 `❌ ${map.toUpperCase()} banned
