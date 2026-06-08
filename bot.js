@@ -760,11 +760,15 @@ Commands:
 !ticketpanel
 !pet
 !friendship
+
+🎮 VCT
 !bo1
+!bo3
 !ban
+!pick
 !status
 !cancelban
-      `);
+`);
     }
 
     // JOKE
