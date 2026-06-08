@@ -454,25 +454,26 @@ ${map.toUpperCase()}`,
     );
   }
 
-  if (session.phase === 'pick2') {
-
-    session.phase = 'ban3';
-    session.turn = session.captains[0];
-
-    activeMapBans.set(
-      message.channel.id,
-      session
-    );
-
-    return message.reply(
+return message.reply(
 `🎮 Picks Complete
+
+Remaining Maps:
+
+${session.maps
+  .map(
+    m =>
+      `• ${m.charAt(0).toUpperCase() + m.slice(1)}`
+  )
+  .join('\n')}
 
 Phase:
 BAN 3
 
-<@${session.turn}> bans next.`
-    );
-  }
+<@${session.turn}> bans next.
+
+Use:
+!ban <map>`
+);
 }
 
 // ============================================================
