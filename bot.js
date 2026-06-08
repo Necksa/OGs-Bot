@@ -454,6 +454,14 @@ ${map.toUpperCase()}`,
     );
   }
 
+session.phase = 'ban3';
+session.turn = session.captains[0];
+
+activeMapBans.set(
+  message.channel.id,
+  session
+);
+
 return message.reply(
 `🎮 Picks Complete
 
