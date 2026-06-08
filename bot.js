@@ -402,7 +402,65 @@ Use:
 !ban <map>`
   );
 }
+// ============================================================
+// BO3 START
+// ============================================================
 
+if (command === 'bo3') {
+
+  const captainA =
+    message.mentions.users.first();
+
+  const captainB =
+    message.mentions.users.at(1);
+
+  if (!captainA || !captainB) {
+
+    return message.reply(
+      'Use: !bo3 @CaptainA @CaptainB'
+    );
+  }
+
+  if (
+    activeMapBans.has(
+      message.channel.id
+    )
+  ) {
+
+    return message.reply(
+      '❌ A draft is already active.'
+    );
+  }
+
+  activeMapBans.set(
+    message.channel.id,
+    {
+      mode: 'bo3',
+
+      captains: [
+        captainA.id,
+        captainB.id
+      ],
+
+      turn: captainA.id,
+
+      maps: [...MAP_POOL],
+
+      picks: [],
+
+      phase: 'ban1'
+    }
+  );
+
+  return message.reply(
+`🎮 BO3 STARTED
+
+Phase:
+BAN 1
+
+${captainA} bans first.`
+  );
+}
 // ============================================================
 // BAN MAP
 // ============================================================
