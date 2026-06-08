@@ -523,8 +523,17 @@ if (command === 'bo3') {
 Phase:
 BAN 1
 
-${captainA} bans first.`
-  );
+${captainA} bans first.
+
+Remaining Maps:
+
+${MAP_POOL.map(
+  m => `• ${m.charAt(0).toUpperCase() + m.slice(1)}`
+).join('\n')}
+
+Use:
+!ban <map>`
+);
 }
 if (command === 'ban') {
 
