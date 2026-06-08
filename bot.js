@@ -457,6 +457,85 @@ if (command === 'pick') {
     files: [mapImages[map]]
   });
 
+  if (
+    session.phase === 'pick1'
+  ) {
+
+    session.phase = 'pick2';
+
+    session.turn =
+      session.captains[1];
+
+    return message.reply(
+      `<@${session.turn}> picks next.`
+    );
+  }
+
+  if (
+    session.phase === 'pick2'
+  ) {
+
+    session.phase = 'ban3';
+
+    session.turn =
+      session.captains[0];
+
+    return message.reply(
+`🎮 Picks Complete
+
+Phase:
+BAN 3
+
+<@${session.turn}> bans next.`
+    );
+  }
+
+}
+
+  if (
+    !session ||
+    session.mode !== 'bo3'
+  ) {
+
+    return message.reply(
+      '❌ No active BO3.'
+    );
+  }
+
+  if (
+    message.author.id !== session.turn
+  ) {
+
+    return message.reply(
+      '❌ Not your turn.'
+    );
+  }
+
+  const map =
+    args.join(' ').toLowerCase();
+
+  if (
+    !session.maps.includes(map)
+  ) {
+
+    return message.reply(
+      '❌ Invalid map.'
+    );
+  }
+
+  session.maps =
+    session.maps.filter(
+      m => m !== map
+    );
+
+  session.picks.push(map);
+
+  await message.channel.send({
+    content:
+      `🗺️ MAP PICKED\n\n${map.toUpperCase()}`,
+    files: [mapImages[map]]
+  });
+
   // PICK 1 -> PICK 2
 
   if (
