@@ -817,6 +817,7 @@ Commands:
 !ban
 !status
 !cancelban
+!bo3
       `);
     }
 
